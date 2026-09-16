@@ -1,121 +1,173 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import type { Product, Category, Subcategory } from "@/types";
+import type { Product, Category, Subcategory } from '@/types'
+
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
+  if (!url || !key) return null
+  return { url, key }
+}
+
+export function isSupabaseConfigured(): boolean {
+  return getSupabaseConfig() !== null
+}
 
 export async function createClient() {
+  const config = getSupabaseConfig()
+
+  if (!config) {
+    throw new Error('Supabase is not configured for this environment')
+  }
+
   const cookieStore = await cookies()
 
-  // Create a server's supabase client with newly configured cookie,
-  // which could be used to maintain user's session
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have proxy refreshing
-            // user sessions.
-          }
-        },
+  return createServerClient(config.url, config.key, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
       },
-    }
-  )
-};
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // Server Components cannot always persist refreshed cookies.
+        }
+      },
+    },
+  })
+}
 
 export async function fetchProducts(): Promise<Product[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      category:categories(*),
-      subcategory:subcategories(*),
-      brand:brands(*)
-    `)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+  if (!isSupabaseConfigured()) return []
 
-  if (error) {
-    console.error(error)
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        subcategory:subcategories(*),
+        brand:brands(*)
+      `)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('fetchProducts:', error.message)
+      return []
+    }
+
+    return data ?? []
+  } catch (error) {
+    console.error('fetchProducts:', error)
     return []
   }
-  return data ?? []
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      category:categories(*),
-      subcategory:subcategories(*),
-      brand:brands(*)
-    `)
-    .eq('id', id)
-    .single()
+  if (!isSupabaseConfigured()) return null
 
-  if (error) {
-    console.error(error)
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        subcategory:subcategories(*),
+        brand:brands(*)
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      console.error('fetchProductById:', error.message)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('fetchProductById:', error)
     return null
   }
-  return data
 }
 
 export async function fetchFeaturedProducts(): Promise<Product[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      category:categories(*),
-      subcategory:subcategories(*),
-      brand:brands(*)
-    `)
-    .eq('is_featured', true)
-    .eq('is_active', true)
+  if (!isSupabaseConfigured()) return []
 
-  if (error) {
-    console.error(error)
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        subcategory:subcategories(*),
+        brand:brands(*)
+      `)
+      .eq('is_featured', true)
+      .eq('is_active', true)
+
+    if (error) {
+      console.error('fetchFeaturedProducts:', error.message)
+      return []
+    }
+
+    return data ?? []
+  } catch (error) {
+    console.error('fetchFeaturedProducts:', error)
     return []
   }
-  return data ?? []
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name')
+  if (!isSupabaseConfigured()) return []
 
-  if (error) {
-    console.error(error)
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
+
+    if (error) {
+      console.error('fetchCategories:', error.message)
+      return []
+    }
+
+    return data ?? []
+  } catch (error) {
+    console.error('fetchCategories:', error)
     return []
   }
-  return data ?? []
 }
 
-export async function fetchSubcategoriesByCategoryId(categoryId: string): Promise<Subcategory[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('subcategories')
-    .select('*')
-    .eq('category_id', categoryId)
-    .order('name')
+export async function fetchSubcategoriesByCategoryId(
+  categoryId: string
+): Promise<Subcategory[]> {
+  if (!isSupabaseConfigured()) return []
 
-  if (error) {
-    console.error(error)
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('subcategories')
+      .select('*')
+      .eq('category_id', categoryId)
+      .order('name')
+
+    if (error) {
+      console.error('fetchSubcategoriesByCategoryId:', error.message)
+      return []
+    }
+
+    return data ?? []
+  } catch (error) {
+    console.error('fetchSubcategoriesByCategoryId:', error)
     return []
   }
-  return data ?? []
 }
