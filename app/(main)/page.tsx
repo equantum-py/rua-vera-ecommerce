@@ -8,6 +8,8 @@ const arrivals = [
   { brand: "LANHTROPY", name: "New season", price: "Próximamente", tone: "bg-[#b8afa8]", href: "/shop", demo: false },
 ];
 
+const brands = ["Paradiso", "Las Sureñas", "Lanhtropy", "Bahía María", "Heidi Clair", "Flabelus", "AT – Ati Troche", "ERNESTINA", "MAZ by RUA", "ANGELO", "AYRA", "FEDORA", "TASCHEN", "VOLUSPA", "PAPELÊ"];
+
 export default function Page() {
   return (
     <main className="bg-[#f7f4ef] text-[#201e1c]">
@@ -19,9 +21,7 @@ export default function Page() {
           <div className="mt-9 flex flex-wrap gap-3"><Link href="/demo-product" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Probar compra demo</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
         </div>
         <div className="flex items-center justify-center bg-[#eee9e3] p-4 sm:p-7 md:min-h-[650px] md:p-10">
-          <div className="relative w-full overflow-hidden bg-[#eee9e3]" style={{ aspectRatio: "420 / 289" }}>
-            <Image src="/brand/marcas-con-identidad.svg" alt="RUA Vera — Marcas con identidad" fill priority className="object-contain" sizes="(max-width: 768px) 100vw, 60vw" />
-          </div>
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "420 / 289" }}><Image src="/brand/marcas-con-identidad.svg" alt="RUA Vera — Marcas con identidad" fill priority className="object-contain" sizes="(max-width: 768px) 100vw, 60vw" /></div>
         </div>
       </section>
 
@@ -31,13 +31,14 @@ export default function Page() {
       </section>
 
       <section className="border-y border-[#cfc7c0] bg-[#eee9e3]">
-        <div className="mx-auto grid max-w-[1600px] gap-10 px-[4%] py-16 md:grid-cols-[0.34fr_0.66fr] md:items-center md:py-24">
-          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Colecciones · Categorías</p><h2 className="mt-4 font-serif text-5xl leading-[0.95] md:text-7xl">Hoy somos RUA.</h2><p className="mt-6 max-w-sm text-sm leading-7 text-[#6e6965]">Moda, lifestyle y piezas con identidad. Una selección de marcas elegidas por su estética y su capacidad de aportar valor al universo RUA.</p><Link href="/categories" className="mt-8 inline-block border-b border-[#201e1c] pb-1 text-[10px] uppercase tracking-[0.18em]">Explorar marcas y colecciones →</Link></div>
-          <Link href="/categories" className="group block bg-[#eee9e3]">
-            <div className="relative w-full overflow-hidden bg-[#eee9e3]" style={{ aspectRatio: "320 / 206" }}>
-              <Image src="/brand/colecciones-marcas.svg" alt="Colecciones y marcas que forman RUA Vera" fill className="object-contain transition duration-500 group-hover:scale-[1.008]" sizes="(max-width: 768px) 100vw, 66vw" />
+        <div className="mx-auto grid max-w-[1600px] gap-12 px-[4%] py-16 md:grid-cols-[0.36fr_0.64fr] md:items-center md:py-24">
+          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Colecciones · Categorías</p><h2 className="mt-4 font-serif text-5xl leading-[0.95] md:text-7xl">Hoy somos RUA.</h2><p className="mt-6 max-w-sm text-sm leading-7 text-[#6e6965]">Cada marca fue seleccionada por su identidad, estética y su capacidad de aportar valor al universo RUA.</p><Link href="/categories" className="mt-8 inline-block border-b border-[#201e1c] pb-1 text-[10px] uppercase tracking-[0.18em]">Explorar marcas y colecciones →</Link></div>
+          <div className="border border-[#cfc7c0] bg-[#f7f4ef] p-7 md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr]">
+              <div><p className="font-serif text-4xl italic leading-none">Hoy somos</p><h3 className="mt-5 text-xs font-semibold uppercase tracking-[0.16em]">Marcas que forman RUA</h3><p className="mt-4 text-sm leading-7 text-[#6e6965]">Moda, lifestyle y piezas con identidad, reunidas dentro de una misma curaduría.</p></div>
+              <div className="grid grid-cols-2 border-t border-[#cfc7c0] sm:grid-cols-3">{brands.map((brand) => <Link key={brand} href="/shop" className="border-b border-[#cfc7c0] py-3 pr-3 font-serif text-base transition-opacity hover:opacity-50">{brand}</Link>)}</div>
             </div>
-          </Link>
+          </div>
         </div>
       </section>
 
