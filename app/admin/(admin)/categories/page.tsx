@@ -1,11 +1,7 @@
-import React from 'react'
+"use client";
+import { useState } from "react";
+import { FolderTree, Plus, X } from "lucide-react";
 
-const CategoriesPage = () => {
-  return (
-    <div>
-      Categories Page
-    </div>
-  )
-}
-
-export default CategoriesPage
+const initial=[{name:"Moda",products:0,active:true},{name:"Lifestyle",products:0,active:true},{name:"Objetos & Diseño",products:0,active:true}];
+export default function CategoriesPage(){const[open,setOpen]=useState(false);return <div className="mx-auto max-w-[1500px]"><div className="flex items-end justify-between border-b border-[#d6cfc8] pb-6"><div><p className="text-[10px] uppercase tracking-[.2em] text-[#817a74]">Organización</p><h1 className="mt-2 font-serif text-4xl">Categorías & colecciones</h1><p className="mt-2 text-sm text-[#756f69]">Relacioná productos, ordená el catálogo y definí qué se muestra en la tienda.</p></div><button onClick={()=>setOpen(true)} className="hidden items-center gap-2 bg-[#201e1c] px-5 py-3 text-[10px] uppercase tracking-[.16em] text-white sm:flex"><Plus className="size-4"/> Nueva categoría</button></div><div className="mt-6 grid gap-4 md:grid-cols-3">{initial.map((x,i)=><div key={x.name} className="border border-[#d9d2cb] bg-[#fbf9f6] p-5"><div className="flex justify-between"><span className="text-[9px] uppercase tracking-[.18em] text-[#817a74]">0{i+1}</span><span className="text-[9px] uppercase tracking-[.14em]">Visible</span></div><div className="mt-10 flex size-10 items-center justify-center bg-[#ebe5df]"><FolderTree className="size-4"/></div><h2 className="mt-5 font-serif text-2xl">{x.name}</h2><p className="mt-1 text-xs text-[#817a74]">{x.products} productos relacionados</p><div className="mt-6 flex gap-4 text-[9px] uppercase tracking-[.14em]"><button>Editar</button><button>Relacionar productos</button></div></div>)}</div><button onClick={()=>setOpen(true)} className="mt-5 flex items-center gap-2 bg-[#201e1c] px-5 py-3 text-[10px] uppercase tracking-[.16em] text-white sm:hidden"><Plus className="size-4"/> Nueva categoría</button>{open&&<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4"><form onSubmit={e=>{e.preventDefault();setOpen(false)}} className="w-full max-w-lg bg-[#f7f4ef] p-6 shadow-2xl"><div className="flex justify-between"><h2 className="font-serif text-3xl">Nueva categoría</h2><button type="button" onClick={()=>setOpen(false)}><X/></button></div><div className="mt-7 space-y-4"><Input label="Nombre" placeholder="Ej. Accesorios"/><Input label="Slug" placeholder="accesorios"/><Input label="Descripción" placeholder="Descripción de la categoría"/><label className="flex items-center gap-3 text-sm"><input type="checkbox" defaultChecked/> Visible en la tienda</label><label className="flex items-center gap-3 text-sm"><input type="checkbox"/> Destacar en Home</label></div><button className="mt-7 w-full bg-[#201e1c] py-3 text-xs text-white">Guardar categoría</button></form></div>}</div>}
+function Input({label,placeholder}:{label:string;placeholder:string}){return <label className="block"><span className="text-[10px] uppercase tracking-[.14em] text-[#706a65]">{label}</span><input placeholder={placeholder} className="mt-2 h-11 w-full border border-[#d8d1ca] bg-white px-3 text-sm outline-none"/></label>}
