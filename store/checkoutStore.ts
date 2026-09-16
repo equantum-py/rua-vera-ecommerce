@@ -2,14 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ShippingForm, CheckoutStore } from '@/types';
 
-
 const defaultShipping: ShippingForm = {
   full_name: '',
   email: '',
   phone: '',
+  document: '',
+  ruc: '',
+  invoice_name: '',
   address: '',
   city: '',
-  country: 'Kenya',
+  neighborhood: '',
+  reference: '',
+  country: 'Paraguay',
+  delivery_method: 'delivery',
 }
 
 export const useCheckoutStore = create<CheckoutStore>()(
@@ -21,6 +26,6 @@ export const useCheckoutStore = create<CheckoutStore>()(
       setOrderId: (orderId) => set({ orderId }),
       reset: () => set({ shipping: defaultShipping, orderId: null }),
     }),
-    { name: 'konashop-checkout' }
+    { name: 'rua-vera-checkout' }
   )
 )
