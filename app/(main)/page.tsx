@@ -21,7 +21,7 @@ export default function Page() {
           <div className="mt-9 flex flex-wrap gap-3"><Link href="/shop" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Explorar productos</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
         </div>
         <Link href="/shop?category=Moda" className="group relative min-h-[430px] overflow-hidden bg-[#eee9e3] md:min-h-[650px]" aria-label="Explorar colección de moda RUA">
-          <Image src="/brand/rua-banner-moda.png" alt="RUA Vera — Colección de moda" fill priority className="object-cover object-center transition duration-700 group-hover:scale-[1.015]" sizes="(max-width: 768px) 100vw, 60vw" />
+          <Image src="/brand/rua-banner-moda.png" alt="RUA Vera — Colección de moda" fill priority className="object-cover object-right transition duration-700 group-hover:scale-[1.015]" sizes="(max-width: 768px) 100vw, 60vw" />
         </Link>
       </section>
 
