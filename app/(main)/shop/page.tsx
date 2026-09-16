@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { getCategories, getSubcategories, getSubcategoryProducts } from '@/lib/queries'
 import { createClient } from '@/lib/supabase/client'
 import { useCartStore } from '@/store/cartStore'
 import ProductCard from '@/components/layout/ProductCard'
-import { ProductCardProduct } from "@/types";
+import { ProductCardProduct } from '@/types'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart } from 'lucide-react'
 import {
@@ -29,14 +30,15 @@ import {
 
 const PRODUCTS_PER_PAGE = 12
 
-export default function ShopPage() {
+function ShopContent() {
   const params = useSearchParams()
   const router = useRouter()
   const categorySlug = params.get('category')
   const subSlug = params.get('sub')
-  const currentPage = Number(params.get('page') ?? 1)
+  const parsedPage = Number(params.get('page') ?? 1)
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1
 
-  const addItem = useCartStore(s => s.addItem)
+  const addItem = useCartStore((s) => s.addItem)
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -59,11 +61,11 @@ export default function ShopPage() {
     enabled: !!selectedSubcategory?.id,
   })
 
-  // Pagination
   const totalPages = Math.ceil((products?.length ?? 0) / PRODUCTS_PER_PAGE)
+  const safeCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1
   const paginatedProducts = products?.slice(
-    (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
+    (safeCurrentPage - 1) * PRODUCTS_PER_PAGE,
+    safeCurrentPage * PRODUCTS_PER_PAGE
   )
 
   const goToPage = (page: number) => {
@@ -72,20 +74,27 @@ export default function ShopPage() {
     router.push(`?${newParams.toString()}`)
   }
 
-
-  const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>, product: ProductCardProduct): Promise<void> => {
+  const handleAddToCart = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    product: ProductCardProduct
+  ): Promise<void> => {
     e.preventDefault()
     e.stopPropagation()
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
     await addItem(user.id, { product_id: product.id, quantity: 1 })
   }
 
   return (
     <div className="w-[90%] mx-auto py-8">
-
-      {/* Breadcrumb */}
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -116,7 +125,6 @@ export default function ShopPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
           {selectedCategory?.name}
@@ -131,7 +139,6 @@ export default function ShopPage() {
         </span>
       </div>
 
-      {/* Loading skeletons */}
       {isLoading && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {[...Array(8)].map((_, i) => (
@@ -140,16 +147,16 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Empty state */}
       {!isLoading && products?.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 gap-4 text-muted-foreground">
           <ShoppingCart size={48} className="opacity-30" />
           <p className="text-lg font-medium">No products found in this subcategory</p>
-          <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
+          <Button variant="outline" onClick={() => router.back()}>
+            Go Back
+          </Button>
         </div>
       )}
 
-      {/* Grid */}
       {!isLoading && paginatedProducts && paginatedProducts.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {paginatedProducts.map((product) => (
@@ -162,36 +169,49 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-10 flex flex-col items-center gap-3">
           <p className="text-xs text-muted-foreground tracking-wide">
-            Page {currentPage} of {totalPages} — showing {paginatedProducts?.length} of {products?.length} products
+            Page {safeCurrentPage} of {totalPages} — showing {paginatedProducts?.length ?? 0} of {products?.length ?? 0} products
           </p>
           <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
                   href="#"
-                  onClick={(e) => { e.preventDefault(); if (currentPage > 1) goToPage(currentPage - 1) }}
-                  aria-disabled={currentPage === 1}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (safeCurrentPage > 1) goToPage(safeCurrentPage - 1)
+                  }}
+                  aria-disabled={safeCurrentPage === 1}
+                  className={safeCurrentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                const showPage = page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1
-                const showEllipsisBefore = page === currentPage - 2 && currentPage > 3
-                const showEllipsisAfter = page === currentPage + 2 && currentPage < totalPages - 2
+                const showPage =
+                  page === 1 || page === totalPages || Math.abs(page - safeCurrentPage) <= 1
+                const showEllipsisBefore = page === safeCurrentPage - 2 && safeCurrentPage > 3
+                const showEllipsisAfter =
+                  page === safeCurrentPage + 2 && safeCurrentPage < totalPages - 2
+
                 if (showEllipsisBefore || showEllipsisAfter) {
-                  return <PaginationItem key={`ellipsis-${page}`}><PaginationEllipsis /></PaginationItem>
+                  return (
+                    <PaginationItem key={`ellipsis-${page}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )
                 }
                 if (!showPage) return null
+
                 return (
                   <PaginationItem key={page}>
                     <PaginationLink
                       href="#"
-                      onClick={(e) => { e.preventDefault(); goToPage(page) }}
-                      isActive={page === currentPage}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        goToPage(page)
+                      }}
+                      isActive={page === safeCurrentPage}
                     >
                       {page}
                     </PaginationLink>
@@ -201,16 +221,39 @@ export default function ShopPage() {
               <PaginationItem>
                 <PaginationNext
                   href="#"
-                  onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) goToPage(currentPage + 1) }}
-                  aria-disabled={currentPage === totalPages}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (safeCurrentPage < totalPages) goToPage(safeCurrentPage + 1)
+                  }}
+                  aria-disabled={safeCurrentPage === totalPages}
+                  className={safeCurrentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </div>
       )}
-
     </div>
+  )
+}
+
+function ShopFallback() {
+  return (
+    <div className="w-[90%] mx-auto py-8">
+      <div className="h-8 w-48 rounded bg-muted animate-pulse mb-8" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="h-72 rounded-xl bg-muted animate-pulse" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<ShopFallback />}>
+      <ShopContent />
+    </Suspense>
   )
 }
