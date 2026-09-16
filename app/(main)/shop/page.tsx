@@ -1,82 +1,56 @@
 'use client'
 
-import { Suspense, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { getCategories, getSubcategories, getSubcategoryProducts } from '@/lib/queries'
-import { createClient } from '@/lib/supabase/client'
-import { useCartStore } from '@/store/cartStore'
-import ProductCard from '@/components/layout/ProductCard'
-import { ProductCardProduct } from '@/types'
-import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal, X, ShoppingBag } from 'lucide-react'
 
-const PRODUCTS_PER_PAGE = 24
+type DemoProduct = { name:string; sku:string; brand:string; category:string; price:number; oldPrice:number; discount:number; stock:number; sizes:string; colors:string; collection:string; state:string; description:string; imageUrl:string; status:string }
+const KEY='rua-admin-products-v1'
+const PRODUCTS_PER_PAGE=24
+const tones=['#d8cec5','#c9c0b8','#e5ddd5','#b8afa8','#d4cbc2','#c0b7af']
+const fallback:DemoProduct[]=[
+{name:'Vestido Lino Vera',sku:'RUA-0001',brand:'Paradiso',category:'Moda',price:590000,oldPrice:690000,discount:14,stock:12,sizes:'S,M,L,XL',colors:'Crudo,Negro',collection:'Nueva temporada',state:'Activo',description:'Vestido de lino de silueta elegante.',imageUrl:'',status:'Listo'},
+{name:'Camisa Serena',sku:'RUA-0002',brand:'Las Sureñas',category:'Moda',price:420000,oldPrice:490000,discount:14,stock:18,sizes:'S,M,L',colors:'Blanco,Crudo',collection:'Nueva temporada',state:'Activo',description:'Camisa liviana de estética atemporal.',imageUrl:'',status:'Listo'},
+{name:'Pantalón Amalfi',sku:'RUA-0003',brand:'Lanhtropy',category:'Moda',price:510000,oldPrice:590000,discount:14,stock:10,sizes:'S,M,L',colors:'Arena',collection:'Resort',state:'Activo',description:'Pantalón de caída fluida.',imageUrl:'',status:'Listo'},
+{name:'Blazer Vera',sku:'RUA-0004',brand:'ERNESTINA',category:'Moda',price:780000,oldPrice:890000,discount:12,stock:7,sizes:'S,M,L',colors:'Negro,Beige',collection:'RUA Edit',state:'Activo',description:'Blazer de líneas limpias.',imageUrl:'',status:'Listo'},
+{name:'Top Aura',sku:'RUA-0005',brand:'MAZ by RUA',category:'Moda',price:290000,oldPrice:340000,discount:15,stock:22,sizes:'S,M,L',colors:'Negro,Crudo',collection:'RUA Edit',state:'Activo',description:'Top esencial de temporada.',imageUrl:'',status:'Listo'},
+{name:'Falda Midi Clara',sku:'RUA-0006',brand:'Bahía María',category:'Moda',price:450000,oldPrice:520000,discount:13,stock:14,sizes:'S,M,L',colors:'Arena',collection:'Resort',state:'Activo',description:'Falda midi femenina.',imageUrl:'',status:'Listo'},
+{name:'Vestido Noche Sur',sku:'RUA-0007',brand:'Heidi Clair',category:'Moda',price:890000,oldPrice:990000,discount:10,stock:6,sizes:'S,M,L',colors:'Negro',collection:'Noche',state:'Activo',description:'Vestido para ocasiones especiales.',imageUrl:'',status:'Listo'},
+{name:'Sandalia Alma',sku:'RUA-0008',brand:'Flabelus',category:'Moda',price:650000,oldPrice:720000,discount:10,stock:9,sizes:'36,37,38,39',colors:'Natural',collection:'Resort',state:'Activo',description:'Sandalia seleccionada por RUA.',imageUrl:'',status:'Listo'},
+{name:'Kimono Ati',sku:'RUA-0009',brand:'AT – Ati Troche',category:'Moda',price:540000,oldPrice:620000,discount:13,stock:11,sizes:'Único',colors:'Estampado',collection:'RUA Edit',state:'Activo',description:'Kimono de autor.',imageUrl:'',status:'Listo'},
+{name:'Cartera Angelo Mini',sku:'RUA-0010',brand:'ANGELO',category:'Objetos & Diseño',price:720000,oldPrice:820000,discount:12,stock:8,sizes:'Único',colors:'Negro',collection:'Piezas con identidad',state:'Activo',description:'Cartera compacta de diseño.',imageUrl:'',status:'Listo'},
+{name:'Bolso Ayra Weekend',sku:'RUA-0011',brand:'AYRA',category:'Objetos & Diseño',price:680000,oldPrice:760000,discount:11,stock:5,sizes:'Único',colors:'Natural',collection:'Piezas con identidad',state:'Activo',description:'Bolso amplio para escapadas.',imageUrl:'',status:'Listo'},
+{name:'Sombrero Fedora Classic',sku:'RUA-0012',brand:'FEDORA',category:'Moda',price:390000,oldPrice:450000,discount:13,stock:13,sizes:'S,M,L',colors:'Camel',collection:'Piezas con identidad',state:'Activo',description:'Sombrero clásico seleccionado.',imageUrl:'',status:'Listo'},
+{name:'Libro Fashion Icons',sku:'RUA-0013',brand:'TASCHEN',category:'Objetos & Diseño',price:480000,oldPrice:480000,discount:0,stock:9,sizes:'',colors:'',collection:'Books',state:'Activo',description:'Libro de moda y diseño.',imageUrl:'',status:'Listo'},
+{name:'Vela Baltic Amber',sku:'RUA-0014',brand:'VOLUSPA',category:'Lifestyle',price:360000,oldPrice:420000,discount:14,stock:16,sizes:'',colors:'',collection:'Aromas',state:'Activo',description:'Vela aromática premium.',imageUrl:'',status:'Listo'},
+{name:'Difusor French Cade',sku:'RUA-0015',brand:'VOLUSPA',category:'Lifestyle',price:410000,oldPrice:470000,discount:13,stock:12,sizes:'',colors:'',collection:'Aromas',state:'Activo',description:'Difusor para el hogar.',imageUrl:'',status:'Listo'},
+{name:'Cuaderno Papelê RUA',sku:'RUA-0016',brand:'PAPELÊ',category:'Objetos & Diseño',price:145000,oldPrice:170000,discount:15,stock:25,sizes:'',colors:'',collection:'Papelería',state:'Activo',description:'Cuaderno de edición seleccionada.',imageUrl:'',status:'Listo'},
+{name:'Agenda Papelê 2027',sku:'RUA-0017',brand:'PAPELÊ',category:'Objetos & Diseño',price:195000,oldPrice:230000,discount:15,stock:20,sizes:'',colors:'',collection:'Papelería',state:'Activo',description:'Agenda de diseño.',imageUrl:'',status:'Listo'},
+{name:'Collar Angelo Line',sku:'RUA-0018',brand:'ANGELO',category:'Moda',price:330000,oldPrice:390000,discount:15,stock:15,sizes:'',colors:'Dorado',collection:'Accesorios',state:'Activo',description:'Collar de líneas minimalistas.',imageUrl:'',status:'Listo'},
+{name:'Pañuelo Bahía',sku:'RUA-0019',brand:'Bahía María',category:'Moda',price:220000,oldPrice:260000,discount:15,stock:17,sizes:'',colors:'Estampado',collection:'Accesorios',state:'Activo',description:'Pañuelo liviano estampado.',imageUrl:'',status:'Listo'},
+{name:'Camisa Resort',sku:'RUA-0020',brand:'Lanhtropy',category:'Moda',price:470000,oldPrice:540000,discount:13,stock:9,sizes:'S,M,L',colors:'Blanco',collection:'Resort',state:'Activo',description:'Camisa fresca de temporada.',imageUrl:'',status:'Listo'},
+{name:'Vestido Paradiso Sol',sku:'RUA-0021',brand:'Paradiso',category:'Moda',price:640000,oldPrice:740000,discount:14,stock:8,sizes:'S,M,L',colors:'Natural',collection:'Resort',state:'Activo',description:'Vestido liviano para verano.',imageUrl:'',status:'Listo'},
+{name:'Set Home Aroma',sku:'RUA-0022',brand:'VOLUSPA',category:'Lifestyle',price:590000,oldPrice:680000,discount:13,stock:7,sizes:'',colors:'',collection:'Aromas',state:'Activo',description:'Set de aromas para el hogar.',imageUrl:'',status:'Listo'},
+{name:'Bandeja Ayra Deco',sku:'RUA-0023',brand:'AYRA',category:'Objetos & Diseño',price:280000,oldPrice:330000,discount:15,stock:10,sizes:'',colors:'Natural',collection:'Home',state:'Activo',description:'Bandeja decorativa.',imageUrl:'',status:'Listo'},
+{name:'Libro Interior Design',sku:'RUA-0024',brand:'TASCHEN',category:'Objetos & Diseño',price:520000,oldPrice:520000,discount:0,stock:6,sizes:'',colors:'',collection:'Books',state:'Activo',description:'Selección editorial de interiorismo.',imageUrl:'',status:'Listo'},
+{name:'Gift Box RUA',sku:'RUA-0025',brand:'RUA Vera',category:'Lifestyle',price:450000,oldPrice:520000,discount:13,stock:20,sizes:'',colors:'',collection:'RUA Edit',state:'Activo',description:'Caja de regalo curada por RUA.',imageUrl:'',status:'Listo'}]
 
-function ShopContent() {
-  const params = useSearchParams()
-  const router = useRouter()
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const [sort, setSort] = useState('featured')
-  const categorySlug = params.get('category')
-  const subSlug = params.get('sub')
-  const parsedPage = Number(params.get('page') ?? 1)
-  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1
-  const addItem = useCartStore((s) => s.addItem)
-
-  const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
-  const selectedCategory = categories?.find((c) => c.slug === categorySlug)
-  const { data: subcategories } = useQuery({ queryKey: ['subcategories', selectedCategory?.id ?? null], queryFn: () => getSubcategories(selectedCategory!.id), enabled: !!selectedCategory?.id })
-  const selectedSubcategory = subcategories?.find((s) => s.slug === subSlug)
-  const { data: products, isLoading } = useQuery({ queryKey: ['products', selectedSubcategory?.id ?? null], queryFn: () => getSubcategoryProducts(selectedSubcategory!.id, { onlyActive: true }), enabled: !!selectedSubcategory?.id })
-
-  const sortedProducts = useMemo(() => {
-    const list = [...(products ?? [])]
-    if (sort === 'price-asc') return list.sort((a, b) => Number(a.offer_price ?? a.price ?? 0) - Number(b.offer_price ?? b.price ?? 0))
-    if (sort === 'price-desc') return list.sort((a, b) => Number(b.offer_price ?? b.price ?? 0) - Number(a.offer_price ?? a.price ?? 0))
-    if (sort === 'name') return list.sort((a, b) => a.name.localeCompare(b.name))
-    return list
-  }, [products, sort])
-
-  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE)
-  const safeCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1
-  const paginatedProducts = sortedProducts.slice((safeCurrentPage - 1) * PRODUCTS_PER_PAGE, safeCurrentPage * PRODUCTS_PER_PAGE)
-
-  const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>, product: ProductCardProduct) => {
-    e.preventDefault(); e.stopPropagation()
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-    await addItem(user.id, { product_id: product.id, quantity: 1 })
-  }
-
-  return (
-    <main className="min-h-screen bg-[#f7f4ef] text-[#201e1c]">
-      <header className="border-b border-[#d9d2cb] px-[4%] pb-10 pt-14 md:pb-14 md:pt-20">
-        <p className="text-[10px] uppercase tracking-[0.24em] text-[#6e6965]">RUA Vera · Selección</p>
-        <div className="mt-4 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-          <h1 className="font-serif text-5xl tracking-[-0.04em] md:text-7xl">{selectedSubcategory?.name ?? selectedCategory?.name ?? 'Novedades'}</h1>
-          <p className="max-w-md text-sm leading-6 text-[#6e6965]">Una selección curada de moda, lifestyle y objetos de marcas con identidad.</p>
-        </div>
-      </header>
-
-      <div className="sticky top-[112px] z-30 flex items-center justify-between border-b border-[#d9d2cb] bg-[#f7f4ef]/95 px-[4%] py-4 backdrop-blur">
-        <button onClick={() => setFiltersOpen(!filtersOpen)} className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em]"><SlidersHorizontal size={14} /> Filtrar {filtersOpen ? <X size={13} /> : <span className="text-[#8f8a87]">({sortedProducts.length})</span>}</button>
-        <div className="flex items-center gap-3"><span className="hidden text-[10px] uppercase tracking-[0.16em] text-[#6e6965] sm:inline">Ordenar por</span><div className="relative"><select value={sort} onChange={(e) => setSort(e.target.value)} className="appearance-none bg-transparent py-1 pl-2 pr-7 text-[10px] uppercase tracking-[0.12em] outline-none"><option value="featured">Destacados</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option><option value="name">Nombre</option></select><ChevronDown size={13} className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2" /></div></div>
-      </div>
-
-      {filtersOpen && <aside className="grid border-b border-[#d9d2cb] bg-[#eee9e3] px-[4%] py-7 sm:grid-cols-2 lg:grid-cols-4"><div><p className="text-[10px] uppercase tracking-[0.18em]">Categoría</p><div className="mt-4 flex flex-col gap-2">{categories?.slice(0,6).map((category) => <button key={category.id} onClick={() => router.push(`/shop?category=${category.slug}`)} className="w-fit text-left font-serif text-lg hover:underline">{category.name}</button>)}</div></div><div><p className="text-[10px] uppercase tracking-[0.18em]">Colección</p><div className="mt-4 flex flex-col gap-2">{subcategories?.slice(0,6).map((sub) => <button key={sub.id} onClick={() => router.push(`/shop?category=${categorySlug}&sub=${sub.slug}`)} className="w-fit text-left font-serif text-lg hover:underline">{sub.name}</button>)}</div></div><div><p className="text-[10px] uppercase tracking-[0.18em]">Precio</p><p className="mt-4 text-sm text-[#6e6965]">Ordená la selección por precio desde el menú superior.</p></div><div><p className="text-[10px] uppercase tracking-[0.18em]">Disponibilidad</p><p className="mt-4 text-sm text-[#6e6965]">Productos activos disponibles en la selección RUA.</p></div></aside>}
-
-      <section className="px-[3%] py-10 md:py-14">
-        {isLoading && <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">{Array.from({ length: 8 }).map((_, i) => <div key={i}><div className="aspect-[3/4] animate-pulse bg-[#e5ddd5]"/><div className="mt-4 h-3 w-1/3 bg-[#e5ddd5]"/><div className="mt-2 h-4 w-2/3 bg-[#e5ddd5]"/></div>)}</div>}
-        {!isLoading && paginatedProducts.length === 0 && <div className="mx-auto max-w-xl py-28 text-center"><p className="text-[10px] uppercase tracking-[0.22em] text-[#8f8a87]">RUA Vera</p><h2 className="mt-4 font-serif text-4xl">Esta selección estará disponible próximamente.</h2><p className="mt-4 text-sm leading-6 text-[#6e6965]">Explorá nuestras marcas o elegí otra categoría para seguir descubriendo.</p><button onClick={() => router.push('/categories')} className="mt-7 border-b border-[#201e1c] pb-1 text-[10px] uppercase tracking-[0.18em]">Ver marcas</button></div>}
-        {!isLoading && paginatedProducts.length > 0 && <div className="grid grid-cols-2 gap-x-3 gap-y-12 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-16">{paginatedProducts.map((product) => <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />)}</div>}
-      </section>
-
-      {totalPages > 1 && <div className="flex items-center justify-center gap-5 border-t border-[#d9d2cb] px-[4%] py-10 text-[10px] uppercase tracking-[0.16em]"><button disabled={safeCurrentPage === 1} onClick={() => router.push(`?${new URLSearchParams({...Object.fromEntries(params.entries()), page: String(safeCurrentPage - 1)}).toString()}`)} className="disabled:opacity-30">← Anterior</button><span>{safeCurrentPage} / {totalPages}</span><button disabled={safeCurrentPage === totalPages} onClick={() => router.push(`?${new URLSearchParams({...Object.fromEntries(params.entries()), page: String(safeCurrentPage + 1)}).toString()}`)} className="disabled:opacity-30">Siguiente →</button></div>}
-    </main>
-  )
-}
-
-function ShopFallback() { return <div className="min-h-screen bg-[#f7f4ef] px-[3%] py-20"><div className="h-16 w-64 animate-pulse bg-[#e5ddd5]"/><div className="mt-16 grid grid-cols-2 gap-3 md:grid-cols-4">{Array.from({length:8}).map((_,i)=><div key={i} className="aspect-[3/4] animate-pulse bg-[#e5ddd5]"/>)}</div></div> }
-
-export default function ShopPage() { return <Suspense fallback={<ShopFallback />}><ShopContent /></Suspense> }
+function money(n:number){return `Gs. ${new Intl.NumberFormat('es-PY').format(n)}`}
+function ShopContent(){
+ const params=useSearchParams(),router=useRouter(); const [products,setProducts]=useState<DemoProduct[]>(fallback),[filtersOpen,setFiltersOpen]=useState(false),[sort,setSort]=useState('featured');
+ useEffect(()=>{try{const saved=localStorage.getItem(KEY);if(saved){const parsed=JSON.parse(saved) as DemoProduct[];if(Array.isArray(parsed)&&parsed.length)setProducts(parsed)}}catch{}},[])
+ const category=params.get('category')||''; const collection=params.get('collection')||''; const page=Math.max(1,Number(params.get('page')||1)||1)
+ const categories=useMemo(()=>Array.from(new Set(products.map(p=>p.category).filter(Boolean))),[products]); const collections=useMemo(()=>Array.from(new Set(products.map(p=>p.collection).filter(Boolean))),[products]);
+ const active=useMemo(()=>products.filter(p=>p.state.toLowerCase()==='activo'&&(!category||p.category===category)&&(!collection||p.collection===collection)),[products,category,collection]);
+ const sorted=useMemo(()=>{const x=[...active];if(sort==='price-asc')x.sort((a,b)=>a.price-b.price);if(sort==='price-desc')x.sort((a,b)=>b.price-a.price);if(sort==='name')x.sort((a,b)=>a.name.localeCompare(b.name));return x},[active,sort]);
+ const pages=Math.max(1,Math.ceil(sorted.length/PRODUCTS_PER_PAGE)),safe=Math.min(page,pages),shown=sorted.slice((safe-1)*PRODUCTS_PER_PAGE,safe*PRODUCTS_PER_PAGE);
+ const go=(c?:string,col?:string)=>{const q=new URLSearchParams();if(c)q.set('category',c);if(col)q.set('collection',col);router.push(`/shop${q.size?'?'+q.toString():''}`)}
+ return <main className="min-h-screen bg-[#f7f4ef] text-[#201e1c]">
+  <header className="border-b border-[#d9d2cb] px-[4%] pb-10 pt-14 md:pb-14 md:pt-20"><p className="text-[10px] uppercase tracking-[.24em] text-[#6e6965]">RUA Vera · Selección</p><div className="mt-4 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><h1 className="font-serif text-5xl tracking-[-.04em] md:text-7xl">{category||collection||'Novedades'}</h1><p className="mt-3 text-[10px] uppercase tracking-[.18em] text-[#8f8a87]">{active.length} productos</p></div><p className="max-w-md text-sm leading-6 text-[#6e6965]">Una selección curada de moda, lifestyle y objetos de marcas con identidad.</p></div></header>
+  <div className="sticky top-[112px] z-30 flex items-center justify-between border-b border-[#d9d2cb] bg-[#f7f4ef]/95 px-[4%] py-4 backdrop-blur"><button onClick={()=>setFiltersOpen(!filtersOpen)} className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em]"><SlidersHorizontal size={14}/> Filtrar <span className="text-[#8f8a87]">({active.length})</span>{filtersOpen&&<X size={13}/>}</button><div className="relative"><select value={sort} onChange={e=>setSort(e.target.value)} className="appearance-none bg-transparent py-1 pl-2 pr-7 text-[10px] uppercase tracking-[.12em] outline-none"><option value="featured">Destacados</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option><option value="name">Nombre</option></select><ChevronDown size={13} className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2"/></div></div>
+  {filtersOpen&&<aside className="grid gap-8 border-b border-[#d9d2cb] bg-[#eee9e3] px-[4%] py-7 md:grid-cols-2"><div><p className="text-[10px] uppercase tracking-[.18em]">Categoría</p><div className="mt-4 flex flex-wrap gap-x-6 gap-y-2"><button onClick={()=>go()} className="font-serif text-lg hover:underline">Todas</button>{categories.map(c=><button key={c} onClick={()=>go(c)} className="font-serif text-lg hover:underline">{c}</button>)}</div></div><div><p className="text-[10px] uppercase tracking-[.18em]">Colección</p><div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">{collections.map(c=><button key={c} onClick={()=>go(category,c)} className="font-serif text-lg hover:underline">{c}</button>)}</div></div></aside>}
+  <section className="px-[3%] py-10 md:py-14"><div className="grid grid-cols-2 gap-x-3 gap-y-12 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-16">{shown.map((p,i)=><article key={p.sku} className="group"><div className="relative aspect-[3/4] overflow-hidden" style={{backgroundColor:tones[i%tones.length]}}>{p.imageUrl?<img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover"/>:<><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10 md:text-7xl">RUA</span><span className="absolute right-3 top-3 text-[9px] tracking-[.18em] text-[#201e1c]/45">{p.sku.replace('RUA-','')}</span></>}{p.discount>0&&<span className="absolute left-3 top-3 bg-[#201e1c] px-2.5 py-1.5 text-[9px] uppercase tracking-[.16em] text-white">-{p.discount}%</span>}<button className="absolute bottom-0 left-0 right-0 hidden translate-y-full items-center justify-center gap-2 bg-[#201e1c] py-4 text-[9px] uppercase tracking-[.2em] text-white transition group-hover:translate-y-0 md:flex"><ShoppingBag size={13}/> Ver producto</button></div><div className="pt-4"><p className="text-[9px] font-semibold uppercase tracking-[.16em]">{p.brand}</p><h2 className="mt-1 font-serif text-[18px] leading-5">{p.name}</h2><p className="mt-1 text-[10px] uppercase tracking-[.12em] text-[#8f8a87]">{p.collection||p.category}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-xs"><span>{money(p.price)}</span>{p.oldPrice>p.price&&<span className="text-[#8f8a87] line-through">{money(p.oldPrice)}</span>}</div>{p.stock<=5&&<p className="mt-2 text-[9px] uppercase tracking-[.12em] text-[#8a4d3a]">Últimas {p.stock} unidades</p>}</div></article>)}</div></section>
+  {pages>1&&<div className="flex items-center justify-center gap-5 border-t border-[#d9d2cb] px-[4%] py-10 text-[10px] uppercase tracking-[.16em]"><button disabled={safe===1} onClick={()=>router.push(`/shop?page=${safe-1}`)} className="disabled:opacity-30">← Anterior</button><span>{safe} / {pages}</span><button disabled={safe===pages} onClick={()=>router.push(`/shop?page=${safe+1}`)} className="disabled:opacity-30">Siguiente →</button></div>}
+ </main>}
+function Fallback(){return <div className="min-h-screen bg-[#f7f4ef] p-20">Cargando catálogo RUA…</div>}
+export default function ShopPage(){return <Suspense fallback={<Fallback/>}><ShopContent/></Suspense>}
