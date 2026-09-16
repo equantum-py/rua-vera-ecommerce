@@ -1,51 +1,52 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const arrivals = [
+type HomeProduct = { brand: string; name: string; price: string; oldPrice: string; discount: number; tone: string; href: string };
+
+const moda: HomeProduct[] = [
   { brand: "PARADISO", name: "Vestido Lino Vera", price: "Gs. 590.000", oldPrice: "Gs. 690.000", discount: 14, tone: "bg-[#d8cec5]", href: "/shop?category=Moda" },
   { brand: "LAS SUREÑAS", name: "Camisa Serena", price: "Gs. 420.000", oldPrice: "Gs. 490.000", discount: 14, tone: "bg-[#c8c0b9]", href: "/shop?category=Moda" },
   { brand: "LANHTROPY", name: "Pantalón Amalfi", price: "Gs. 510.000", oldPrice: "Gs. 590.000", discount: 14, tone: "bg-[#e5ddd5]", href: "/shop?category=Moda" },
   { brand: "ERNESTINA", name: "Blazer Vera", price: "Gs. 780.000", oldPrice: "Gs. 890.000", discount: 12, tone: "bg-[#b8afa8]", href: "/shop?category=Moda" },
-  { brand: "MAZ BY RUA", name: "Top Aura", price: "Gs. 290.000", oldPrice: "Gs. 340.000", discount: 15, tone: "bg-[#d4cbc2]", href: "/shop?category=Moda" },
-  { brand: "BAHÍA MARÍA", name: "Falda Midi Clara", price: "Gs. 450.000", oldPrice: "Gs. 520.000", discount: 13, tone: "bg-[#c0b7af]", href: "/shop?category=Moda" },
+];
+
+const lifestyle: HomeProduct[] = [
   { brand: "VOLUSPA", name: "Vela Baltic Amber", price: "Gs. 360.000", oldPrice: "Gs. 420.000", discount: 14, tone: "bg-[#ded6cd]", href: "/shop?category=Lifestyle" },
-  { brand: "ANGELO", name: "Cartera Angelo Mini", price: "Gs. 720.000", oldPrice: "Gs. 820.000", discount: 12, tone: "bg-[#c9beb5]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
-  { brand: "PAPELÊ", name: "Cuaderno Papelê RUA", price: "Gs. 145.000", oldPrice: "Gs. 170.000", discount: 15, tone: "bg-[#e8e0d8]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
-  { brand: "Flabelus", name: "Sandalia Alma", price: "Gs. 650.000", oldPrice: "Gs. 720.000", discount: 10, tone: "bg-[#bdb4ad]", href: "/shop?category=Moda" },
-  { brand: "AYRA", name: "Bolso Ayra Weekend", price: "Gs. 680.000", oldPrice: "Gs. 760.000", discount: 11, tone: "bg-[#d5ccc4]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
   { brand: "VOLUSPA", name: "Difusor French Cade", price: "Gs. 410.000", oldPrice: "Gs. 470.000", discount: 13, tone: "bg-[#c7bdb5]", href: "/shop?category=Lifestyle" },
+  { brand: "VOLUSPA", name: "Set Home Aroma", price: "Gs. 590.000", oldPrice: "Gs. 680.000", discount: 13, tone: "bg-[#d9d0c7]", href: "/shop?category=Lifestyle" },
+  { brand: "RUA VERA", name: "Gift Box RUA", price: "Gs. 450.000", oldPrice: "Gs. 520.000", discount: 13, tone: "bg-[#bfb5ad]", href: "/shop?category=Lifestyle" },
+];
+
+const objetos: HomeProduct[] = [
+  { brand: "ANGELO", name: "Cartera Angelo Mini", price: "Gs. 720.000", oldPrice: "Gs. 820.000", discount: 12, tone: "bg-[#c9beb5]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
+  { brand: "AYRA", name: "Bolso Ayra Weekend", price: "Gs. 680.000", oldPrice: "Gs. 760.000", discount: 11, tone: "bg-[#d5ccc4]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
+  { brand: "PAPELÊ", name: "Cuaderno Papelê RUA", price: "Gs. 145.000", oldPrice: "Gs. 170.000", discount: 15, tone: "bg-[#e8e0d8]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
+  { brand: "TASCHEN", name: "Libro Fashion Icons", price: "Gs. 480.000", oldPrice: "Gs. 480.000", discount: 0, tone: "bg-[#c5bbb3]", href: "/shop?category=Objetos%20%26%20Dise%C3%B1o" },
 ];
 
 const brands = ["Paradiso", "Las Sureñas", "Lanhtropy", "Bahía María", "Heidi Clair", "Flabelus", "AT – Ati Troche", "ERNESTINA", "MAZ by RUA", "ANGELO", "AYRA", "FEDORA", "TASCHEN", "VOLUSPA", "PAPELÊ"];
+
+function ProductCard({ item, index }: { item: HomeProduct; index: number }) {
+  return <Link href={item.href} className="group"><div className={`relative aspect-[3/4] overflow-hidden ${item.tone}`}>{item.discount > 0 && <span className="absolute left-4 top-4 z-10 bg-[#201e1c] px-3 py-2 text-[8px] uppercase tracking-[0.18em] text-white">-{item.discount}%</span>}<span className="absolute right-4 top-4 text-[9px] uppercase tracking-[0.2em] text-[#201e1c]/60">{String(index + 1).padStart(2, '0')}</span><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10 md:text-7xl">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[0.18em] text-white transition-transform group-hover:translate-y-0">Ver en catálogo</span></div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em]">{item.brand}</p><p className="mt-1 font-serif text-lg">{item.name}</p><div className="mt-1 flex flex-wrap items-center gap-2 text-xs"><span>{item.price}</span>{item.oldPrice !== item.price && <span className="text-[#8f8a87] line-through">{item.oldPrice}</span>}</div><span className="mt-3 inline-block border-b border-[#201e1c] pb-1 text-[9px] uppercase tracking-[0.16em]">Ver producto →</span></Link>;
+}
+
+function ProductSection({ eyebrow, title, description, products, href, background = "bg-[#f7f4ef]" }: { eyebrow: string; title: string; description: string; products: HomeProduct[]; href: string; background?: string }) {
+  return <section className={`${background} border-b border-[#d8d0c8]`}><div className="mx-auto max-w-[1600px] px-[3%] py-14 md:py-20"><div className="mb-9 grid gap-5 border-b border-[#cfc7c0] pb-6 md:grid-cols-[1fr_auto] md:items-end"><div><p className="mb-2 text-[9px] uppercase tracking-[0.24em] text-[#77716c]">{eyebrow}</p><h2 className="font-serif text-4xl leading-none md:text-5xl">{title}</h2><p className="mt-4 max-w-xl text-sm leading-6 text-[#77716c]">{description}</p></div><Link href={href} className="w-fit text-[9px] uppercase tracking-[0.18em]">Ver toda la categoría →</Link></div><div className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-5">{products.map((item, index) => <ProductCard key={item.name} item={item} index={index} />)}</div></div></section>;
+}
 
 export default function Page() {
   return (
     <main className="bg-[#f7f4ef] text-[#201e1c]">
       <section className="grid md:grid-cols-[0.82fr_1.18fr]">
-        <div className="flex flex-col justify-center bg-[#8f8a87] px-[7%] py-16 text-white md:min-h-[650px] md:py-24">
-          <p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-white/70">RUA Vera · Asunción</p>
-          <h1 className="max-w-xl font-serif text-5xl leading-[0.96] tracking-[-0.04em] sm:text-6xl lg:text-8xl">Nuevas formas de descubrir.</h1>
-          <p className="mt-7 max-w-md text-sm leading-7 text-white/75">Moda, lifestyle y objetos seleccionados de marcas con identidad propia.</p>
-          <div className="mt-9 flex flex-wrap gap-3"><Link href="/shop" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Explorar productos</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
-        </div>
-        <Link href="/shop?category=Moda" className="group relative min-h-[430px] overflow-hidden bg-[#eee9e3] md:min-h-[650px]" aria-label="Explorar colección de moda RUA">
-          <Image src="/brand/rua-banner-moda.png" alt="RUA Vera — Colección de moda" fill priority className="object-cover object-right transition duration-700 group-hover:scale-[1.015]" sizes="(max-width: 768px) 100vw, 60vw" />
-        </Link>
+        <div className="flex flex-col justify-center bg-[#8f8a87] px-[7%] py-16 text-white md:min-h-[650px] md:py-24"><p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-white/70">RUA Vera · Asunción</p><h1 className="max-w-xl font-serif text-5xl leading-[0.96] tracking-[-0.04em] sm:text-6xl lg:text-8xl">Nuevas formas de descubrir.</h1><p className="mt-7 max-w-md text-sm leading-7 text-white/75">Moda, lifestyle y objetos seleccionados de marcas con identidad propia.</p><div className="mt-9 flex flex-wrap gap-3"><Link href="/shop" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Explorar productos</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div></div>
+        <Link href="/shop?category=Moda" className="group relative min-h-[430px] overflow-hidden bg-[#eee9e3] md:min-h-[650px]" aria-label="Explorar colección de moda RUA"><Image src="/brand/rua-banner-moda.png" alt="RUA Vera — Colección de moda" fill priority className="object-cover object-right transition duration-700 group-hover:scale-[1.015]" sizes="(max-width: 768px) 100vw, 60vw" /></Link>
       </section>
 
-      <section className="mx-auto max-w-[1600px] px-[3%] py-16 md:py-24">
-        <div className="mb-9 flex items-end justify-between border-b border-[#cfc7c0] pb-5"><div><p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Selección RUA · Catálogo demo</p><h2 className="font-serif text-4xl md:text-5xl">Descubrí más</h2></div><Link href="/shop" className="text-[10px] uppercase tracking-[0.18em]">Ver los 25 productos →</Link></div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">{arrivals.map((item, index) => <Link href={item.href} key={item.name} className="group"><div className={`relative aspect-[3/4] overflow-hidden ${item.tone}`}><span className="absolute left-4 top-4 z-10 bg-[#201e1c] px-3 py-2 text-[8px] uppercase tracking-[0.18em] text-white">-{item.discount}%</span><span className="absolute right-4 top-4 text-[9px] uppercase tracking-[0.2em] text-[#201e1c]/60">{String(index + 1).padStart(2, '0')}</span><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10 md:text-7xl">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[0.18em] text-white transition-transform group-hover:translate-y-0">Ver en catálogo</span></div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em]">{item.brand}</p><p className="mt-1 font-serif text-lg">{item.name}</p><div className="mt-1 flex flex-wrap items-center gap-2 text-xs"><span>{item.price}</span><span className="text-[#8f8a87] line-through">{item.oldPrice}</span></div><span className="mt-3 inline-block border-b border-[#201e1c] pb-1 text-[9px] uppercase tracking-[0.16em]">Ver producto →</span></Link>)}</div>
-      </section>
+      <ProductSection eyebrow="Nueva temporada · 01" title="Moda" description="Una selección de prendas y accesorios de las marcas que forman RUA." products={moda} href="/shop?category=Moda" />
+      <ProductSection eyebrow="Para vivir RUA · 02" title="Lifestyle" description="Aromas, detalles y propuestas seleccionadas para acompañar tus espacios y momentos." products={lifestyle} href="/shop?category=Lifestyle" background="bg-[#eee9e3]" />
+      <ProductSection eyebrow="Piezas con identidad · 03" title="Objetos & Diseño" description="Libros, accesorios y objetos especiales elegidos por su diseño e identidad." products={objetos} href="/shop?category=Objetos%20%26%20Dise%C3%B1o" />
 
-      <section className="border-y border-[#cfc7c0] bg-[#eee9e3]">
-        <div className="mx-auto grid max-w-[1600px] gap-12 px-[4%] py-16 md:grid-cols-[0.36fr_0.64fr] md:items-center md:py-24">
-          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Colecciones · Categorías</p><h2 className="mt-4 font-serif text-5xl leading-[0.95] md:text-7xl">Hoy somos RUA.</h2><p className="mt-6 max-w-sm text-sm leading-7 text-[#6e6965]">Cada marca fue seleccionada por su identidad, estética y su capacidad de aportar valor al universo RUA.</p><Link href="/categories" className="mt-8 inline-block border-b border-[#201e1c] pb-1 text-[10px] uppercase tracking-[0.18em]">Explorar marcas y colecciones →</Link></div>
-          <div className="border border-[#cfc7c0] bg-[#f7f4ef] p-7 md:p-10"><div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr]"><div><p className="font-serif text-4xl italic leading-none">Hoy somos</p><h3 className="mt-5 text-xs font-semibold uppercase tracking-[0.16em]">Marcas que forman RUA</h3><p className="mt-4 text-sm leading-7 text-[#6e6965]">Moda, lifestyle y piezas con identidad, reunidas dentro de una misma curaduría.</p></div><div className="grid grid-cols-2 border-t border-[#cfc7c0] sm:grid-cols-3">{brands.map((brand) => <Link key={brand} href="/shop" className="border-b border-[#cfc7c0] py-3 pr-3 font-serif text-base transition-opacity hover:opacity-50">{brand}</Link>)}</div></div></div>
-        </div>
-      </section>
-
-      <section className="grid md:grid-cols-3">{[["MODA","Prendas y propuestas seleccionadas para descubrir una nueva temporada.","/shop?category=Moda"],["LIFESTYLE","Aromas, detalles y piezas para vivir RUA más allá de la moda.","/shop?category=Lifestyle"],["OBJETOS & DISEÑO","Objetos especiales que completan una curaduría con identidad.","/shop?category=Objetos%20%26%20Dise%C3%B1o"]].map(([title,copy,href],i) => <Link href={href} key={title} className={`flex min-h-[360px] flex-col justify-end border border-[#f7f4ef]/30 p-8 text-white ${i===1?"bg-[#6e6965]":i===2?"bg-[#b4aaa2]":"bg-[#8f8a87]"}`}><span className="text-[9px] uppercase tracking-[0.22em]">0{i+1}</span><h3 className="mt-3 font-serif text-4xl">{title}</h3><p className="mt-4 max-w-sm text-sm leading-6 text-white/70">{copy}</p><span className="mt-7 text-[10px] uppercase tracking-[0.18em]">Comprar →</span></Link>)}</section>
+      <section className="border-y border-[#cfc7c0] bg-[#eee9e3]"><div className="mx-auto grid max-w-[1600px] gap-12 px-[4%] py-16 md:grid-cols-[0.36fr_0.64fr] md:items-center md:py-24"><div><p className="text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Colecciones · Categorías</p><h2 className="mt-4 font-serif text-5xl leading-[0.95] md:text-7xl">Hoy somos RUA.</h2><p className="mt-6 max-w-sm text-sm leading-7 text-[#6e6965]">Cada marca fue seleccionada por su identidad, estética y su capacidad de aportar valor al universo RUA.</p><Link href="/categories" className="mt-8 inline-block border-b border-[#201e1c] pb-1 text-[10px] uppercase tracking-[0.18em]">Explorar marcas y colecciones →</Link></div><div className="border border-[#cfc7c0] bg-[#f7f4ef] p-7 md:p-10"><div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr]"><div><p className="font-serif text-4xl italic leading-none">Hoy somos</p><h3 className="mt-5 text-xs font-semibold uppercase tracking-[0.16em]">Marcas que forman RUA</h3><p className="mt-4 text-sm leading-7 text-[#6e6965]">Moda, lifestyle y piezas con identidad, reunidas dentro de una misma curaduría.</p></div><div className="grid grid-cols-2 border-t border-[#cfc7c0] sm:grid-cols-3">{brands.map((brand) => <Link key={brand} href="/shop" className="border-b border-[#cfc7c0] py-3 pr-3 font-serif text-base transition-opacity hover:opacity-50">{brand}</Link>)}</div></div></div></div></section>
 
       <section className="bg-[#201e1c] px-[5%] py-20 text-center text-white md:py-28"><p className="text-[10px] uppercase tracking-[0.25em] text-white/50">The RUA edit</p><h2 className="mx-auto mt-5 max-w-4xl font-serif text-4xl leading-tight md:text-7xl">No se trata solo de comprar. Se trata de descubrir.</h2><p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-white/55">Una experiencia curada donde moda, diseño y lifestyle conviven con marcas que tienen algo propio para contar.</p><Link href="/shop" className="mt-9 inline-block bg-white px-8 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Explorar los 25 productos</Link></section>
 
