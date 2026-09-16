@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const arrivals = [
-  { brand: "ERNESTINA", name: "Selección RUA", price: "Disponible en tienda", tone: "bg-[#d8cec5]" },
-  { brand: "PARADISO", name: "Nueva colección", price: "Descubrir", tone: "bg-[#c8c0b9]" },
-  { brand: "LAS SUREÑAS", name: "Edición seleccionada", price: "Ver colección", tone: "bg-[#e5ddd5]" },
-  { brand: "LANHTROPY", name: "New season", price: "Explorar", tone: "bg-[#b8afa8]" },
+  { brand: "RUA VERA", name: "Vestido RUA Demo", price: "Gs. 590.000", tone: "bg-[#d8cec5]", href: "/demo-product", demo: true },
+  { brand: "PARADISO", name: "Nueva colección", price: "Próximamente", tone: "bg-[#c8c0b9]", href: "/shop", demo: false },
+  { brand: "LAS SUREÑAS", name: "Edición seleccionada", price: "Próximamente", tone: "bg-[#e5ddd5]", href: "/shop", demo: false },
+  { brand: "LANHTROPY", name: "New season", price: "Próximamente", tone: "bg-[#b8afa8]", href: "/shop", demo: false },
 ];
 
 const brands = ["Paradiso", "Las Sureñas", "Lanhtropy", "Bahía María", "Heidi Clair", "Flabelus", "AT – Ati Troche", "ERNESTINA", "MAZ by RUA", "ANGELO", "AYRA", "FEDORA", "TASCHEN", "VOLUSPA", "PAPELÊ"];
@@ -17,7 +17,7 @@ export default function Page() {
           <p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-white/70">RUA Vera · Asunción</p>
           <h1 className="max-w-xl font-serif text-5xl leading-[0.96] tracking-[-0.04em] sm:text-6xl lg:text-8xl">Nuevas formas de descubrir.</h1>
           <p className="mt-7 max-w-md text-sm leading-7 text-white/75">Moda, lifestyle y objetos seleccionados de marcas con identidad propia.</p>
-          <div className="mt-9 flex flex-wrap gap-3"><Link href="/shop" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Comprar novedades</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
+          <div className="mt-9 flex flex-wrap gap-3"><Link href="/demo-product" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Probar compra demo</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
         </div>
         <div className="relative flex min-h-[480px] items-end overflow-hidden bg-[#ded7cf] p-[7%]">
           <div className="absolute inset-[8%] border border-[#8f8a87]/40" />
@@ -28,7 +28,7 @@ export default function Page() {
 
       <section className="mx-auto max-w-[1600px] px-[3%] py-16 md:py-24">
         <div className="mb-9 flex items-end justify-between border-b border-[#cfc7c0] pb-5"><div><p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-[#6e6965]">Recién llegados</p><h2 className="font-serif text-4xl md:text-5xl">Novedades</h2></div><Link href="/shop" className="text-[10px] uppercase tracking-[0.18em]">Ver todo →</Link></div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-5">{arrivals.map((item, index) => <Link href="/shop" key={item.brand} className="group"><div className={`relative aspect-[3/4] overflow-hidden ${item.tone}`}><span className="absolute left-4 top-4 text-[9px] uppercase tracking-[0.2em] text-[#201e1c]/60">0{index + 1}</span><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10 md:text-7xl">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[0.18em] text-white transition-transform group-hover:translate-y-0">Ver producto</span></div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em]">{item.brand}</p><p className="mt-1 font-serif text-lg">{item.name}</p><p className="mt-1 text-xs text-[#6e6965]">{item.price}</p></Link>)}</div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-5">{arrivals.map((item, index) => <Link href={item.href} key={item.brand} className="group"><div className={`relative aspect-[3/4] overflow-hidden ${item.tone}`}>{item.demo && <span className="absolute left-4 top-4 z-10 bg-[#201e1c] px-3 py-2 text-[8px] uppercase tracking-[0.18em] text-white">Demo disponible</span>}<span className="absolute right-4 top-4 text-[9px] uppercase tracking-[0.2em] text-[#201e1c]/60">0{index + 1}</span><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10 md:text-7xl">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[0.18em] text-white transition-transform group-hover:translate-y-0">{item.demo ? 'Probar recorrido de compra' : 'Ver producto'}</span></div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em]">{item.brand}</p><p className="mt-1 font-serif text-lg">{item.name}</p><p className={`mt-1 text-xs ${item.demo ? 'font-medium text-[#201e1c]' : 'text-[#6e6965]'}`}>{item.price}</p>{item.demo && <span className="mt-3 inline-block border-b border-[#201e1c] pb-1 text-[9px] uppercase tracking-[0.16em]">Comprar demo →</span>}</Link>)}</div>
       </section>
 
       <section className="grid md:grid-cols-3">
