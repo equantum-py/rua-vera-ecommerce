@@ -20,9 +20,10 @@ export default function Page() {
           <p className="mt-7 max-w-md text-sm leading-7 text-white/75">Moda, lifestyle y objetos seleccionados de marcas con identidad propia.</p>
           <div className="mt-9 flex flex-wrap gap-3"><Link href="/shop" className="bg-white px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-[#201e1c]">Explorar productos</Link><Link href="/categories" className="border border-white/60 px-7 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Ver marcas</Link></div>
         </div>
-        <div className="flex items-center justify-center bg-[#eee9e3] p-4 sm:p-7 md:min-h-[650px] md:p-10">
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "420 / 289" }}><Image src="/brand/marcas-con-identidad.svg" alt="RUA Vera — Marcas con identidad" fill priority className="object-contain" sizes="(max-width: 768px) 100vw, 60vw" /></div>
-        </div>
+        <Link href="/shop?category=Moda" className="group relative min-h-[430px] overflow-hidden bg-[#eee9e3] md:min-h-[650px]" aria-label="Explorar colección de moda RUA">
+          <Image src="/brand/rua-banner-moda.png" alt="RUA Vera — Colección de moda" fill priority className="object-cover object-center transition duration-700 group-hover:scale-[1.015]" sizes="(max-width: 768px) 100vw, 60vw" />
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/35 to-transparent px-6 pb-6 pt-24 text-white md:px-9 md:pb-9"><div><p className="text-[9px] uppercase tracking-[0.24em] text-white/80">RUA Edit</p><p className="mt-2 font-serif text-2xl md:text-3xl">Descubrí la colección</p></div><span className="hidden border-b border-white pb-1 text-[9px] uppercase tracking-[0.18em] sm:block">Comprar moda →</span></div>
+        </Link>
       </section>
 
       <section className="mx-auto max-w-[1600px] px-[3%] py-16 md:py-24">
