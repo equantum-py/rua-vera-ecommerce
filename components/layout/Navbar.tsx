@@ -7,11 +7,12 @@ import { Heart, Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
 const navItems = [
-  { label: "Inicio", link: "/" },
-  { label: "Tienda", link: "/shop" },
+  { label: "Novedades", link: "/shop" },
   { label: "Marcas", link: "/categories" },
+  { label: "Moda", link: "/shop" },
+  { label: "Lifestyle", link: "/shop" },
+  { label: "Objetos & Diseño", link: "/shop" },
   { label: "RUA", link: "/about" },
-  { label: "Contacto", link: "/contact" },
 ];
 
 export default function Navbar() {
@@ -21,43 +22,20 @@ export default function Navbar() {
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex h-[74px] w-[90%] items-center justify-between">
-        <Link href="/" className="font-serif text-[27px] tracking-[-0.04em] text-foreground" aria-label="RUA Vera - Inicio">
-          RUA <em className="text-[16px] font-normal">vera</em>
-        </Link>
-
-        <nav className="hidden items-center gap-7 md:flex">
-          {navItems.map((item) => (
-            <Link key={item.link} href={item.link} className={`text-[11px] uppercase tracking-[0.16em] transition hover:text-foreground ${pathname === item.link ? 'text-foreground' : 'text-muted-foreground'}`}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="hidden items-center gap-1 md:flex">
-          <Link href="/shop" aria-label="Buscar" className="p-2.5 text-muted-foreground transition hover:text-foreground"><Search className="h-[17px] w-[17px]" /></Link>
-          <Link href="/favorites" aria-label="Favoritos" className="p-2.5 text-muted-foreground transition hover:text-foreground"><Heart className="h-[17px] w-[17px]" /></Link>
-          <Link href="/account" aria-label="Mi cuenta" className="p-2.5 text-muted-foreground transition hover:text-foreground"><UserRound className="h-[17px] w-[17px]" /></Link>
-          <Link href="/cart" aria-label="Carrito" className="relative p-2.5 text-muted-foreground transition hover:text-foreground">
-            <ShoppingBag className="h-[17px] w-[17px]" />
-            {cartCount > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] text-background">{cartCount}</span>}
-          </Link>
+    <header className="sticky top-0 z-50 bg-[#f7f4ef] text-[#201e1c]">
+      <div className="border-b border-[#d9d2cb] bg-[#201e1c] px-4 py-2 text-center text-[9px] uppercase tracking-[0.2em] text-white/80">RUA Vera · Marcas con identidad · Asunción</div>
+      <div className="mx-auto grid h-[82px] w-[94%] max-w-[1600px] grid-cols-[1fr_auto] items-center border-b border-[#d9d2cb] md:grid-cols-[auto_1fr_auto]">
+        <Link href="/" className="font-serif text-[30px] tracking-[-0.05em]" aria-label="RUA Vera - Inicio">RUA <em className="text-[16px] font-normal">vera</em></Link>
+        <nav className="hidden items-center justify-center gap-6 lg:flex">{navItems.map((item) => <Link key={item.label} href={item.link} className={`border-b py-2 text-[10px] uppercase tracking-[0.16em] transition ${pathname === item.link ? "border-[#201e1c]" : "border-transparent hover:border-[#201e1c]"}`}>{item.label}</Link>)}</nav>
+        <div className="hidden items-center md:flex">
+          <Link href="/shop" aria-label="Buscar" className="p-2.5"><Search className="h-[18px] w-[18px]" /></Link>
+          <Link href="/favorites" aria-label="Favoritos" className="p-2.5"><Heart className="h-[18px] w-[18px]" /></Link>
+          <Link href="/account" aria-label="Mi cuenta" className="p-2.5"><UserRound className="h-[18px] w-[18px]" /></Link>
+          <Link href="/cart" aria-label="Carrito" className="relative p-2.5"><ShoppingBag className="h-[18px] w-[18px]" />{cartCount > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center bg-[#201e1c] px-1 text-[9px] text-white">{cartCount}</span>}</Link>
         </div>
-
-        <button className="p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Abrir menú">{open ? <X /> : <Menu />}</button>
+        <button className="justify-self-end p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Abrir menú">{open ? <X /> : <Menu />}</button>
       </div>
-
-      {open && (
-        <div className="border-t border-border bg-background px-[5%] py-6 md:hidden">
-          <nav className="flex flex-col">
-            {navItems.map((item) => <Link key={item.link} href={item.link} onClick={() => setOpen(false)} className="border-b border-border py-4 font-serif text-2xl">{item.label}</Link>)}
-          </nav>
-          <div className="mt-6 flex gap-5 text-muted-foreground">
-            <Link href="/favorites" aria-label="Favoritos"><Heart /></Link><Link href="/account" aria-label="Cuenta"><UserRound /></Link><Link href="/cart" aria-label="Carrito"><ShoppingBag /></Link>
-          </div>
-        </div>
-      )}
+      {open && <div className="border-b border-[#d9d2cb] bg-[#f7f4ef] px-[5%] py-5 md:hidden"><nav className="flex flex-col">{navItems.map((item) => <Link key={item.label} href={item.link} onClick={() => setOpen(false)} className="border-b border-[#d9d2cb] py-4 font-serif text-2xl">{item.label}</Link>)}</nav><div className="mt-6 flex items-center gap-6"><Link href="/shop"><Search /></Link><Link href="/favorites"><Heart /></Link><Link href="/account"><UserRound /></Link><Link href="/cart"><ShoppingBag /></Link></div></div>}
     </header>
   );
 }
