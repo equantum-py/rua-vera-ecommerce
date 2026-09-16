@@ -1,134 +1,39 @@
-"use client";
-import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { sliderData } from "@/constants";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-
-const CarouselSlider = () => {
-  const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-
- const goToNext = useCallback(() => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentSlide((prev) => (prev + 1) % sliderData.length);
-    setTimeout(() => setIsAnimating(false), 700);
-  }, [isAnimating]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      goToNext();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [goToNext]);
-
-  const goToPrev = useCallback(() => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentSlide((prev) => (prev - 1 + sliderData.length) % sliderData.length);
-    setTimeout(() => setIsAnimating(false), 700);
-  }, [isAnimating]);
-
-  const handleSlideChange = useCallback((index: number) => {
-    if (isAnimating || index === currentSlide) return;
-    setIsAnimating(true);
-    setCurrentSlide(index);
-    setTimeout(() => setIsAnimating(false), 700);
-  }, [isAnimating, currentSlide]);
-
+export default function CarouselSlider() {
   return (
-    <div className="relative w-full overflow-hidden bg-muted/30">
-
-      {/* Slides */}
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-      >
-        {sliderData.map((slide, index) => (
-          <div
-            key={slide.id}
-            className="min-w-full relative grid grid-cols-1 md:grid-cols-2 items-center gap-8 px-6 md:px-16 lg:px-24 py-16 md:py-20"
-          >
-            {/* Slide number */}
-            <span className="absolute top-6 right-6 font-serif text-xs text-muted-foreground tracking-widest">
-              {String(index + 1).padStart(2, '0')} / {String(sliderData.length).padStart(2, '0')}
-            </span>
-
-            {/* Text */}
-            <div className="flex flex-col gap-6 order-2 md:order-1">
-              <div className="flex items-center gap-3">
-                <div className="h-px w-8 bg-primary" />
-                <span className="text-xs tracking-[0.2em] uppercase text-primary">
-                  New Arrival
-                </span>
-              </div>
-              <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-tight font-bold text-foreground">
-                {slide.title}
-              </h1>
-       
-              <div className="flex items-center gap-4 pt-2">
-                <Button className="rounded-full px-8 gap-2 group">
-                  {slide.buttonText1}
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-                {slide.buttonText2 && (
-                  <Button variant="ghost" className="rounded-full px-6 text-muted-foreground hover:text-foreground">
-                    {slide.buttonText2}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Image */}
-            <div className="relative order-1 md:order-2 flex items-center justify-center">
-              <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl scale-75" />
-              <div className="relative w-56 h-56 md:w-80 md:h-80 lg:w-96 lg:h-96">
-                <Image
-                  src={slide.imgSrc}
-                  alt={`Slide ${index + 1}`}
-                  fill
-                  className="object-contain drop-shadow-xl"
-                  priority={index === 0}
-                />
-              </div>
-            </div>
+    <section className="relative overflow-hidden border-b border-border bg-[#8f8a87] text-[#f5f0ea]">
+      <div className="absolute inset-y-0 right-0 w-[44%] opacity-25 rua-wave" aria-hidden="true" />
+      <div className="relative mx-auto grid min-h-[620px] w-[90%] items-center gap-12 py-20 md:grid-cols-[1.15fr_.85fr] md:py-28">
+        <div className="max-w-3xl">
+          <p className="mb-7 text-[11px] uppercase tracking-[0.32em] text-[#eee8e1]">Asunción · Paraguay</p>
+          <h1 className="font-serif text-6xl font-normal leading-[0.92] tracking-[-0.04em] md:text-8xl lg:text-[7.2rem]">
+            Marcas con<br />identidad
+          </h1>
+          <p className="mt-8 max-w-xl text-base leading-7 text-[#eee8e1] md:text-lg">
+            Una calle curada donde conviven moda, diseño y piezas con identidad. Un espacio para descubrir, conectar y vivir RUA.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link href="/shop" className="inline-flex items-center gap-3 bg-[#f5f0ea] px-7 py-4 text-xs uppercase tracking-[0.18em] text-[#292725] transition hover:bg-white">
+              Descubrir RUA <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/about" className="inline-flex items-center border border-[#f5f0ea]/60 px-7 py-4 text-xs uppercase tracking-[0.18em] transition hover:bg-[#f5f0ea]/10">
+              Nuestra historia
+            </Link>
           </div>
-        ))}
+        </div>
+
+        <div className="relative hidden min-h-[430px] md:block">
+          <div className="absolute right-[5%] top-[5%] h-[360px] w-[72%] border border-[#f5f0ea]/45" />
+          <div className="absolute bottom-[8%] left-[3%] max-w-[310px] bg-[#e8e1da] p-8 text-[#292725]">
+            <span className="font-serif text-5xl tracking-[-0.04em]">RUA <em className="text-3xl font-normal">vera</em></span>
+            <div className="my-5 h-px bg-[#8f8a87]/45" />
+            <p className="text-sm leading-6">Cada marca mantiene su esencia y, juntas, construyen un universo común.</p>
+          </div>
+          <div className="absolute right-0 top-24 font-serif text-[10rem] leading-none text-[#f5f0ea]/10">R</div>
+        </div>
       </div>
-
-      {/* Prev / Next arrows */}
-      <button
-        onClick={goToPrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors z-10 shadow-sm"
-      >
-        <ChevronLeft className="w-4 h-4 text-primary" />
-      </button>
-      <button
-        onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors z-10 shadow-sm"
-      >
-        <ChevronRight className="w-4 h-4 text-primary" />
-      </button>
-
-      {/* Dots + progress */}
-      <div className="flex items-center justify-center gap-3 pb-8 pt-2">
-        {sliderData.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => handleSlideChange(index)}
-            className={`transition-all duration-300 rounded-full cursor-pointer ${
-              currentSlide === index
-                ? "w-8 h-2 bg-primary"
-                : "w-2 h-2 bg-foreground/20 hover:bg-foreground/40"
-            }`}
-          />
-        ))}
-      </div>
-
-    </div>
+    </section>
   );
-};
-
-export default CarouselSlider;
+}
