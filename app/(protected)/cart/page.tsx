@@ -1,155 +1,21 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Minus, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { ShoppingBag, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 
-const CartPage = () => {
-  const { items, loading, removeItem, updateQuantity, clearCart } = useCartStore()
-  const [userId, setUserId] = useState<string | null>(null)
+const money = (value: number) => `Gs. ${new Intl.NumberFormat('es-PY').format(value)}`;
 
-  useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user } }) => {
-      if (user) setUserId(user.id)
-    })
-  }, [])
+export default function CartPage() {
+  const { items, loading, removeItem, updateQuantity, clearCart } = useCartStore();
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => { createClient().auth.getUser().then(({ data: { user } }) => { if (user) setUserId(user.id) }) }, []);
+  const total = items.reduce((sum, item) => sum + (Number(item.product?.offer_price ?? item.product?.price) || 0) * item.quantity, 0);
 
-  const total = items.reduce((sum, item) => {
-    const price = Number(item.product?.offer_price ?? item.product?.price) || 0
-    return sum + price * item.quantity
-  }, 0)
+  if (loading) return <div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#201e1c] border-t-transparent" /></div>;
+  if (!items.length) return <main className="flex min-h-[70vh] flex-col items-center justify-center bg-[#f7f4ef] px-6 text-center"><ShoppingBag size={38}/><h1 className="mt-6 font-serif text-4xl">Tu carrito está vacío.</h1><p className="mt-3 text-sm text-[#6e6965]">Descubrí la selección RUA y agregá tus favoritos.</p><Link href="/shop" className="mt-8 bg-[#201e1c] px-8 py-4 text-[10px] uppercase tracking-[0.18em] text-white">Seguir comprando</Link></main>;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
-
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground py-32 min-h-screen">
-        <ShoppingBag size={48} className="opacity-60" />
-        <p className="text-lg font-medium">Your Cart is empty!</p>
-        <Button variant="outline" asChild>
-          <Link href="/categories">Continue Shopping</Link>
-        </Button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="max-w-5xl mx-auto py-12 px-4 min-h-screen md:py-32">
-
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Your Cart</h1>
-        <button
-          onClick={() => userId && clearCart(userId)}
-          className="text-sm text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-        >
-          Clear all
-        </button>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-8">
-
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
-          {items.map((item) => {
-            const image = item.product?.image_url_array?.[0] ?? null
-            const name = item.product?.name ?? 'Unknown Product'
-            const price = Number(item.product?.offer_price ?? item.product?.price) || 0
-
-            return (
-              <div
-                key={item.id}
-                className="flex gap-4 bg-background border border-border rounded-2xl p-4 items-center"
-              >
-                {/* Image */}
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                  {image ? (
-                    <Image
-                      src={image}
-                      alt={name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag size={24} className="text-muted-foreground opacity-40" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Name & Price */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground truncate">{name}</p>
-                  <p className="text-primary font-medium text-sm mt-1">
-                    KSh {(price * item.quantity).toLocaleString()}
-                  </p>
-                  {item.product?.offer_price != null && (
-                    <p className="text-xs text-muted-foreground line-through">
-                      KSh {Number(item.product.price).toLocaleString()}
-                    </p>
-                  )}
-                </div>
-
-                {/* Quantity */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => userId && updateQuantity(userId, item.id, item.quantity - 1)}
-                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted cursor-pointer hover:scale-105 transition-transform"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
-                  <button
-                    onClick={() => userId && updateQuantity(userId, item.id, item.quantity + 1)}
-                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted cursor-pointer hover:scale-105 transition-transform"
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
-
-                {/* Remove */}
-                <button
-                  onClick={() => userId && removeItem(userId, item.id)}
-                  className="text-muted-foreground hover:text-destructive ml-2 cursor-pointer hover:scale-110 transition-transform"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Order Summary */}
-        <div className="self-start sticky top-6 bg-background border border-border rounded-2xl p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Order summary</h2>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Subtotal ({items.length} {items.length === 1 ? 'item' : 'items'})</span>
-            <span>KSh {total.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Shipping</span>
-            <span className="text-green-600 font-medium">Free</span>
-          </div>
-          <div className="border-t border-border pt-4 flex justify-between font-bold text-foreground">
-            <span>Total</span>
-            <span>KSh {total.toLocaleString()}</span>
-          </div>
-          <Button className="w-full" asChild>
-            <Link href="/checkout">Proceed to checkout</Link>
-          </Button>
-        </div>
-
-      </div>
-    </div>
-  )
+  return <main className="min-h-screen bg-[#f7f4ef] px-[4%] py-12 text-[#201e1c] md:py-20"><div className="mx-auto max-w-[1400px]"><div className="mb-10 flex items-end justify-between border-b border-[#d9d2cb] pb-6"><div><p className="text-[10px] uppercase tracking-[0.2em] text-[#6e6965]">RUA Vera</p><h1 className="mt-2 font-serif text-5xl">Tu carrito</h1></div><button onClick={() => userId && clearCart(userId)} className="text-[9px] uppercase tracking-[0.16em] underline">Vaciar carrito</button></div><div className="grid gap-12 lg:grid-cols-[1fr_380px]"><section>{items.map((item) => { const image=item.product?.image_url_array?.[0]; const name=item.product?.name ?? 'Producto'; const price=Number(item.product?.offer_price ?? item.product?.price)||0; return <article key={item.id} className="grid grid-cols-[100px_1fr] gap-5 border-b border-[#d9d2cb] py-6 sm:grid-cols-[130px_1fr_auto]"><div className="relative aspect-[3/4] bg-[#eee9e3]">{image ? <Image src={image} alt={name} fill className="object-cover"/> : <div className="flex h-full items-center justify-center"><ShoppingBag className="opacity-25"/></div>}</div><div><p className="text-[9px] uppercase tracking-[0.18em]">RUA Vera</p><h2 className="mt-2 font-serif text-xl">{name}</h2><p className="mt-3 text-sm">{money(price)}</p><button onClick={() => userId && removeItem(userId,item.id)} className="mt-5 flex items-center gap-1 text-[9px] uppercase tracking-[0.14em] text-[#6e6965]"><Trash2 size={12}/> Quitar</button></div><div className="col-start-2 flex items-center gap-4 self-center sm:col-start-3"><button onClick={() => userId && updateQuantity(userId,item.id,item.quantity-1)} className="border border-[#d9d2cb] p-2"><Minus size={13}/></button><span className="text-sm">{item.quantity}</span><button onClick={() => userId && updateQuantity(userId,item.id,item.quantity+1)} className="border border-[#d9d2cb] p-2"><Plus size={13}/></button></div></article>})}</section><aside className="h-fit border border-[#d9d2cb] bg-white p-7 lg:sticky lg:top-36"><h2 className="font-serif text-2xl">Resumen</h2><div className="mt-6 flex justify-between border-b border-[#d9d2cb] pb-5 text-sm"><span>Subtotal</span><span>{money(total)}</span></div><div className="py-5 text-xs leading-6 text-[#6e6965]">La entrega o retiro en tienda y los medios de pago se seleccionan en el siguiente paso.</div><div className="flex justify-between border-t border-[#d9d2cb] pt-5 font-medium"><span>Total productos</span><span>{money(total)}</span></div><Link href="/checkout" className="mt-7 flex w-full items-center justify-center gap-2 bg-[#201e1c] py-5 text-[10px] uppercase tracking-[0.18em] text-white">Continuar compra <ArrowRight size={14}/></Link><Link href="/shop" className="mt-4 block text-center text-[9px] uppercase tracking-[0.16em] underline">Seguir comprando</Link></aside></div></div></main>;
 }
-
-export default CartPage
