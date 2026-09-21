@@ -108,3 +108,5 @@ This store is built with modern Next.js conventions and user experience in mind.
 
 ---
 
+
+<!-- Production deployment trigger: branch tracking main verified -->
