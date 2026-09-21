@@ -1,5 +1,5 @@
 module Admin
-  class ProductVariantsController < ApplicationController
+  class ProductVariantsController < BaseController
     before_action :set_product
     before_action :set_variant, only: %i[edit update destroy]
 
