@@ -39,13 +39,13 @@ class CheckoutController < ApplicationController
       OrderMailer.customer_confirmation(order).deliver_later
       OrderMailer.store_notification(order).deliver_later
       session[:cart] = {}
-      return redirect_to order_confirmation_path(order)
+      return redirect_to order_confirmation_path(token: order.public_token)
     end
     redirect_to cart_path, alert: "El stock cambió mientras comprabas. Revisá tu carrito."
   end
 
   def confirmation
-    @order = Order.find(params[:id])
+    @order = Order.find_by!(public_token: params[:token])
   end
 
   private
@@ -56,9 +56,10 @@ class CheckoutController < ApplicationController
     cart = session[:cart] || {}
     @items = cart.filter_map do |key, quantity|
       product_id, variant_id = key.to_s.split(":")
-      product = Product.find_by(id: product_id)
+      product = Product.where(active: true).find_by(id: product_id)
       next unless product
-      variant = variant_id.present? ? product.product_variants.find_by(id: variant_id) : nil
+      variant = variant_id.present? ? product.product_variants.where(active: true).find_by(id: variant_id) : nil
+      next if variant_id.present? && variant.nil?
       price = product.selling_price(variant ? variant.effective_price : product.price)
       { key: key, product: product, variant: variant, quantity: quantity.to_i, unit_price: price }
     end
