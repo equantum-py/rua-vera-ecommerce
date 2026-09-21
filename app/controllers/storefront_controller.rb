@@ -1,6 +1,6 @@
 class StorefrontController < ApplicationController
   def home
-    @categories = Category.includes(:products).all
+    @categories = Category.includes(products: :product_variants).all
     @featured_products = Product.where(active: true).order(created_at: :desc).limit(16)
     @banners = Banner.active
   end
@@ -12,6 +12,6 @@ class StorefrontController < ApplicationController
   end
 
   def product
-    @product = Product.find(params[:id])
+    @product = Product.where(active: true).find(params[:id])
   end
 end
