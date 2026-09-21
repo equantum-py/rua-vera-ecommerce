@@ -4,8 +4,8 @@ class CartController < ApplicationController
   end
 
   def add
-    product = Product.find(params[:product_id])
-    variant = params[:variant_id].present? ? product.product_variants.find(params[:variant_id]) : nil
+    product = Product.where(active: true).find(params[:product_id])
+    variant = params[:variant_id].present? ? product.product_variants.where(active: true).find(params[:variant_id]) : nil
     if product.product_variants.where(active: true).exists? && variant.nil?
       return redirect_to product_path(product), alert: "Elegí talle y color antes de agregar al carrito."
     end
@@ -22,7 +22,7 @@ class CartController < ApplicationController
 
   def update
     product, variant = resolve_key(params[:item_key])
-    return redirect_to(cart_path, alert: "Producto no encontrado.") unless product
+    return redirect_to(cart_path, alert: "Producto no disponible.") unless product
     quantity = params[:quantity].to_i
     available = variant ? variant.stock : product.stock
     return redirect_to(cart_path, alert: "Solo quedan #{available} unidades.") if quantity > available
@@ -42,8 +42,9 @@ class CartController < ApplicationController
   def cart_key(product, variant); variant ? "#{product.id}:#{variant.id}" : product.id.to_s; end
   def resolve_key(key)
     product_id, variant_id = key.to_s.split(":")
-    product = Product.find_by(id: product_id)
-    variant = variant_id.present? && product ? product.product_variants.find_by(id: variant_id) : nil
+    product = Product.where(active: true).find_by(id: product_id)
+    variant = variant_id.present? && product ? product.product_variants.where(active: true).find_by(id: variant_id) : nil
+    return [nil, nil] if variant_id.present? && variant.nil?
     [product, variant]
   end
   def load_cart
