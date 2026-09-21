@@ -1,6 +1,6 @@
 'use client'
 
-// deploy-trigger: 2026-09-21-pdp-suspense
+// deploy-trigger: 2026-09-21-git-reconnected
 
 import Image from "next/image";
 import Link from "next/link";
