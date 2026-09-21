@@ -1,5 +1,7 @@
 'use client'
 
+// deploy-trigger: 2026-09-21-pdp-suspense
+
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
