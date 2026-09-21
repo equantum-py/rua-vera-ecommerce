@@ -1,5 +1,5 @@
 module Admin
-  class OrdersController < ApplicationController
+  class OrdersController < BaseController
     before_action :set_order, only: %i[show update]
 
     def index
