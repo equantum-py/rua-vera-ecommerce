@@ -1,5 +1,5 @@
 module Admin
-  class SettingsController < ApplicationController
+  class SettingsController < BaseController
     def index; end
   end
 end
