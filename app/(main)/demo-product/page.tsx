@@ -4,8 +4,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Heart, Minus, PackageCheck, Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
 type Product={name:string;sku:string;brand:string;category:string;price:number;oldPrice:number;discount:number;stock:number;collection:string;state:string;imageUrl?:string;description?:string;color?:string;sizes?:string[]}
@@ -22,8 +22,10 @@ function money(n:number){return n>0?`Gs. ${new Intl.NumberFormat('es-PY').format
 function enrich(p:Product):Product{return {...p,imageUrl:p.imageUrl||knownImages[p.sku],color:p.color||'Crudo',sizes:p.sizes??(p.category==='Moda'?['S','M','L','XL']:[]),description:p.description||`${p.name} de ${p.brand}, seleccionado por RUA Vera por su identidad, diseño y calidad.`}}
 
 function DemoProductContent(){
- const router=useRouter(),params=useSearchParams(),sku=params.get('sku')||'RUA-0001';
+ const router=useRouter();
+ const [sku,setSku]=useState('RUA-0001');
  const [products,setProducts]=useState<Product[]>(fallback),[selectedSize,setSelectedSize]=useState<string|null>(null),[quantity,setQuantity]=useState(1),[error,setError]=useState(false),[open,setOpen]=useState<string|null>('details');
+ useEffect(()=>{const value=new URLSearchParams(window.location.search).get('sku');if(value)setSku(value)},[]);
  useEffect(()=>{try{const saved=localStorage.getItem(KEY);if(saved){const parsed=JSON.parse(saved) as Product[];if(Array.isArray(parsed)&&parsed.length){const map=new Map(fallback.map(p=>[p.sku,p]));parsed.forEach(p=>map.set(p.sku,enrich(p)));setProducts(Array.from(map.values()))}}}catch{}},[]);
  useEffect(()=>{setSelectedSize(null);setQuantity(1);setError(false)},[sku]);
  const product=useMemo(()=>enrich(products.find(p=>p.sku===sku&&String(p.state).toLowerCase()==='activo')||fallback.find(p=>p.sku===sku)||fallback[0]),[products,sku]);
@@ -47,5 +49,5 @@ function DemoProductContent(){
 
 
 export default function DemoProductPage(){
- return <Suspense fallback={<main className="min-h-screen bg-[#f7f4ef]" />}><DemoProductContent /></Suspense>
+ return <DemoProductContent />
 }
