@@ -17,6 +17,9 @@ Rails.application.routes.draw do
     resources :products
     resources :categories
     resources :orders, only: %i[index show update]
+    resources :inventory, only: %i[index update]
+    resources :banners, except: :show
+    resources :promotions, except: :show
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
