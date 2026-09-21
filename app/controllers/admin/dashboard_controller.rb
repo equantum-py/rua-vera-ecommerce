@@ -1,5 +1,5 @@
 module Admin
-  class DashboardController < ApplicationController
+  class DashboardController < BaseController
     def index
       @products_count = Product.count
       @categories_count = Category.count
