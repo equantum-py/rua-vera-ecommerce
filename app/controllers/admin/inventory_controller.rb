@@ -1,5 +1,5 @@
 module Admin
-  class InventoryController < ApplicationController
+  class InventoryController < BaseController
     def index
       @products = Product.includes(:category).order(:stock, :name)
       @low_stock = @products.select { |product| product.stock <= 5 }
