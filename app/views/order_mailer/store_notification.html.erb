@@ -1,0 +1,1 @@
+<h1 style="font-family:Georgia,serif;font-weight:400">Nuevo pedido</h1><p><strong><%= @order.number %></strong> · <%= @order.customer_name %></p><p><%= @order.customer_email %> · <%= @order.customer_phone %></p><p>Total: <strong>Gs. <%= number_with_delimiter(@order.total, delimiter: ".") %></strong></p>
