@@ -3,6 +3,15 @@ Rails.application.routes.draw do
   get "/shop", to: "storefront#shop"
   get "/products/:id", to: "storefront#product", as: :product
 
+  get "/cart", to: "cart#show", as: :cart
+  post "/cart/items/:product_id", to: "cart#add", as: :add_to_cart
+  patch "/cart/items/:product_id", to: "cart#update", as: :update_cart
+  delete "/cart/items/:product_id", to: "cart#remove", as: :remove_cart
+
+  get "/checkout", to: "checkout#show", as: :checkout
+  post "/checkout", to: "checkout#create"
+  get "/orders/:id/confirmation", to: "checkout#confirmation", as: :order_confirmation
+
   namespace :admin do
     root "dashboard#index"
     resources :products
