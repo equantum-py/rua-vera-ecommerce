@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>RUA Vera — Marcas con identidad</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="RUA Vera. Moda, lifestyle, objetos y aromas seleccionados de marcas con identidad propia.">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+</head>
+<body>
+  <header class="site-header"><%= link_to "RUA vera", root_path, class: "logo" %><nav><%= link_to "Tienda", shop_path %><%= link_to "Moda", shop_path(category: "Moda") %><%= link_to "Lifestyle", shop_path(category: "Lifestyle") %><%= link_to "Objetos & Diseño", shop_path(category: "Objetos & Diseño") %></nav><%= link_to "Admin", admin_root_path, class: "admin-link" %></header>
+  <%= yield %>
+  <footer><strong>RUA vera</strong><span>Marcas con identidad · Asunción, Paraguay</span></footer>
+</body>
+</html>
