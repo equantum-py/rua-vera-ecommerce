@@ -2,6 +2,7 @@ class StorefrontController < ApplicationController
   def home
     @categories = Category.includes(:products).all
     @featured_products = Product.where(active: true).order(created_at: :desc).limit(16)
+    @banners = Banner.active
   end
 
   def shop
