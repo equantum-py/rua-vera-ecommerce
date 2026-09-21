@@ -19,7 +19,9 @@ module Admin
       @order = Order.find(params[:id])
     end
     def order_params
-      params.require(:order).permit(:status, :payment_status, :erp_reference)
+      allowed = [:status, :erp_reference]
+      allowed << :payment_status if current_admin_user&.super_admin?
+      params.require(:order).permit(*allowed)
     end
   end
 end
