@@ -22,6 +22,8 @@ Rails.application.routes.draw do
     resources :inventory, only: %i[index update]
     resources :banners, except: :show
     resources :promotions, except: :show
+    resources :customers, only: %i[index show]
+    get "/settings", to: "settings#index", as: :settings
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
