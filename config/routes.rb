@@ -5,8 +5,8 @@ Rails.application.routes.draw do
 
   get "/cart", to: "cart#show", as: :cart
   post "/cart/items/:product_id", to: "cart#add", as: :add_to_cart
-  patch "/cart/items/:product_id", to: "cart#update", as: :update_cart
-  delete "/cart/items/:product_id", to: "cart#remove", as: :remove_cart
+  patch "/cart/items/:item_key", to: "cart#update", as: :update_cart
+  delete "/cart/items/:item_key", to: "cart#remove", as: :remove_cart
 
   get "/checkout", to: "checkout#show", as: :checkout
   post "/checkout", to: "checkout#create"
@@ -14,7 +14,9 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root "dashboard#index"
-    resources :products
+    resources :products do
+      resources :product_variants, except: :show
+    end
     resources :categories
     resources :orders, only: %i[index show update]
     resources :inventory, only: %i[index update]
