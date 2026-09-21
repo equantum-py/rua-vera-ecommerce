@@ -3,6 +3,8 @@ class Product < ApplicationRecord
   has_many :product_variants, dependent: :destroy
   validates :name, :sku, :price, presence: true
   validates :sku, uniqueness: true
+  validates :price, numericality: { greater_than_or_equal_to: 0, only_integer: true }
+  validates :stock, numericality: { greater_than_or_equal_to: 0, only_integer: true }
 
   def active_promotion
     Promotion.where(active: true)
