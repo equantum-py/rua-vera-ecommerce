@@ -10,7 +10,11 @@ Rails.application.routes.draw do
 
   get "/checkout", to: "checkout#show", as: :checkout
   post "/checkout", to: "checkout#create"
-  get "/orders/:id/confirmation", to: "checkout#confirmation", as: :order_confirmation
+  get "/order-confirmation/:token", to: "checkout#confirmation", as: :order_confirmation
+
+  get "/admin/login", to: "admin/sessions#new", as: :admin_login
+  post "/admin/login", to: "admin/sessions#create"
+  delete "/admin/logout", to: "admin/sessions#destroy", as: :admin_logout
 
   namespace :admin do
     root "dashboard#index"
