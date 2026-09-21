@@ -1,5 +1,5 @@
 module Admin
-  class CustomersController < ApplicationController
+  class CustomersController < BaseController
     def index
       @customers = Customer.order(total_spent: :desc)
     end
