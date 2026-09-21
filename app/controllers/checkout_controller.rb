@@ -16,7 +16,12 @@ class CheckoutController < ApplicationController
         raise ActiveRecord::Rollback if available < item[:quantity]
       end
 
+      customer = Customer.find_or_initialize_by(email: checkout_params[:customer_email].downcase)
+      customer.assign_attributes(name: checkout_params[:customer_name], phone: checkout_params[:customer_phone], document: checkout_params[:customer_document])
+      customer.save!
+
       order = Order.create!(
+        customer: customer,
         number: "RUA-#{Time.current.strftime('%y%m%d')}-#{SecureRandom.hex(2).upcase}",
         customer_name: checkout_params[:customer_name], customer_email: checkout_params[:customer_email],
         customer_phone: checkout_params[:customer_phone], customer_document: checkout_params[:customer_document],
@@ -29,6 +34,10 @@ class CheckoutController < ApplicationController
           variant_name: variant&.display_name, sku: variant&.sku || product.sku, unit_price: item[:unit_price], quantity: quantity)
         variant ? variant.decrement!(:stock, quantity) : product.decrement!(:stock, quantity)
       end
+      customer.increment!(:orders_count)
+      customer.increment!(:total_spent, order.total)
+      OrderMailer.customer_confirmation(order).deliver_later
+      OrderMailer.store_notification(order).deliver_later
       session[:cart] = {}
       return redirect_to order_confirmation_path(order)
     end
