@@ -26,3 +26,11 @@ products.each do |name, sku, brand, category, price, compare, stock, image|
   product.assign_attributes(name: name, brand: brand, category: Category.find_by!(name: category), price: price, compare_at_price: compare, stock: stock, image_url: image, active: true, description: "Selección RUA Vera · #{brand}.")
   product.save!
 end
+
+
+if ENV["ADMIN_EMAIL"].present? && ENV["ADMIN_PASSWORD"].present?
+  admin = AdminUser.find_or_initialize_by(email: ENV["ADMIN_EMAIL"].downcase)
+  admin.assign_attributes(password: ENV["ADMIN_PASSWORD"], password_confirmation: ENV["ADMIN_PASSWORD"], role: :super_admin, active: true)
+  admin.save!
+  puts "Administrador inicial configurado desde variables de entorno."
+end
