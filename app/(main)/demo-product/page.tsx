@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ChevronDown, Heart, Minus, PackageCheck, Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
@@ -19,7 +19,7 @@ const fallback:Product[]=raw.map(x=>({name:x[0],sku:x[1],brand:x[2],category:x[3
 function money(n:number){return n>0?`Gs. ${new Intl.NumberFormat('es-PY').format(n)}`:'Consultar precio'}
 function enrich(p:Product):Product{return {...p,imageUrl:p.imageUrl||knownImages[p.sku],color:p.color||'Crudo',sizes:p.sizes??(p.category==='Moda'?['S','M','L','XL']:[]),description:p.description||`${p.name} de ${p.brand}, seleccionado por RUA Vera por su identidad, diseño y calidad.`}}
 
-export default function DemoProductPage(){
+function DemoProductContent(){
  const router=useRouter(),params=useSearchParams(),sku=params.get('sku')||'RUA-0001';
  const [products,setProducts]=useState<Product[]>(fallback),[selectedSize,setSelectedSize]=useState<string|null>(null),[quantity,setQuantity]=useState(1),[error,setError]=useState(false),[open,setOpen]=useState<string|null>('details');
  useEffect(()=>{try{const saved=localStorage.getItem(KEY);if(saved){const parsed=JSON.parse(saved) as Product[];if(Array.isArray(parsed)&&parsed.length){const map=new Map(fallback.map(p=>[p.sku,p]));parsed.forEach(p=>map.set(p.sku,enrich(p)));setProducts(Array.from(map.values()))}}}catch{}},[]);
@@ -41,4 +41,9 @@ export default function DemoProductPage(){
  <div className="mt-4">{accordion('details','Detalles del producto',<p>{product.description}</p>)}{accordion('shipping','Envíos y retiros',<p>Podés seleccionar envío o retiro durante el proceso de compra.</p>)}{accordion('changes','Cambios',<p>Los cambios están sujetos a disponibilidad y condiciones comerciales vigentes.</p>)}</div></aside></section>
  <section className="mx-auto max-w-[1500px] px-[4%] py-16"><div className="mb-8 flex justify-between border-b pb-5"><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">También te puede gustar</p><h2 className="mt-2 font-serif text-4xl">Más de {product.category}</h2></div><Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="text-[9px] uppercase">Ver categoría →</Link></div><div className="grid grid-cols-2 gap-3 md:grid-cols-4">{related.map((p,i)=><Link key={p.sku} href={`/demo-product?sku=${encodeURIComponent(p.sku)}`} className="group"><div className="relative aspect-[3/4] overflow-hidden bg-[#ddd4cb]">{p.imageUrl?<Image src={p.imageUrl} alt={p.name} fill className="object-cover"/>:<span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-black/10">RUA</span>}</div><p className="mt-3 text-[9px] font-semibold uppercase">{p.brand}</p><h3 className="mt-1 font-serif text-lg">{p.name}</h3><p className="text-xs">{money(p.price)}</p></Link>)}</div></section>
  <section className="bg-[#201e1c] px-[5%] py-14 text-center text-white"><RotateCcw size={20} className="mx-auto text-white/60"/><p className="mt-4 text-[9px] uppercase tracking-[.22em] text-white/55">RUA Vera · Marcas con identidad</p><h2 className="mx-auto mt-4 max-w-2xl font-serif text-3xl">Descubrí piezas seleccionadas con identidad.</h2></section></main>
+}
+
+
+export default function DemoProductPage(){
+ return <Suspense fallback={<main className="min-h-screen bg-[#f7f4ef]" />}><DemoProductContent /></Suspense>
 }
