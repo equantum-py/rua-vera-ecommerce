@@ -1,5 +1,5 @@
 module Admin
-  class BannersController < ApplicationController
+  class BannersController < BaseController
     before_action :set_banner, only: %i[edit update destroy]
     def index; @banners = Banner.order(:position); end
     def new; @banner = Banner.new(active: true); end
