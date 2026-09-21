@@ -3,19 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ChevronDown, Heart, Minus, PackageCheck, Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
 const sizes = ['S', 'M', 'L', 'XL'];
 const related = [
-  { name: 'Camisa Serena', brand: 'Las Sureñas', price: 'Gs. 420.000', tone: '#c8c0b9' },
-  { name: 'Pantalón Amalfi', brand: 'Lanhtropy', price: 'Gs. 510.000', tone: '#e5ddd5' },
-  { name: 'Blazer Vera', brand: 'ERNESTINA', price: 'Gs. 780.000', tone: '#b8afa8' },
-  { name: 'Top Aura', brand: 'MAZ by RUA', price: 'Gs. 290.000', tone: '#d4cbc2' },
+  { name: 'Camisa Serena', brand: 'Las Sureñas', price: 'Gs. 420.000', tone: '#c8c0b9', sku:'RUA-0002' },
+  { name: 'Pantalón Amalfi', brand: 'Lanhtropy', price: 'Gs. 510.000', tone: '#e5ddd5', sku:'RUA-0003' },
+  { name: 'Blazer Vera', brand: 'ERNESTINA', price: 'Gs. 780.000', tone: '#b8afa8', sku:'RUA-0004' },
+  { name: 'Top Aura', brand: 'MAZ by RUA', price: 'Gs. 290.000', tone: '#d4cbc2', sku:'RUA-0005' },
 ];
 
 export default function DemoProductPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sku = searchParams.get("sku") || "RUA-0001";
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState(false);
@@ -54,7 +56,7 @@ export default function DemoProductPage() {
       </section>
 
       <section className="border-y border-[#d9d2cb] bg-[#eee9e3]"><div className="mx-auto grid max-w-[1500px] gap-8 px-[4%] py-12 md:grid-cols-3"><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">01 · Material</p><h2 className="mt-3 font-serif text-3xl">Lino liviano</h2><p className="mt-3 max-w-sm text-sm leading-6 text-[#6e6965]">Textura natural y fresca para acompañar días cálidos y looks relajados.</p></div><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">02 · Silueta</p><h2 className="mt-3 font-serif text-3xl">Largo & fluido</h2><p className="mt-3 max-w-sm text-sm leading-6 text-[#6e6965]">Cintura ajustable y caída suave para una silueta simple y elegante.</p></div><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">03 · Selección RUA</p><h2 className="mt-3 font-serif text-3xl">Con identidad</h2><p className="mt-3 max-w-sm text-sm leading-6 text-[#6e6965]">Una pieza seleccionada por su versatilidad, materialidad y diseño atemporal.</p></div></div></section>
-      <section className="mx-auto max-w-[1500px] px-[4%] py-16 md:py-20"><div className="mb-8 flex items-end justify-between border-b border-[#d9d2cb] pb-5"><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">También te puede gustar</p><h2 className="mt-2 font-serif text-4xl">Más de Moda</h2></div><Link href="/shop?category=Moda" className="text-[9px] uppercase tracking-[.16em]">Ver toda la categoría →</Link></div><div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">{related.map(p=><Link key={p.name} href="/shop?category=Moda" className="group"><div className="relative aspect-[3/4] overflow-hidden" style={{backgroundColor:p.tone}}><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[.16em] text-white transition group-hover:translate-y-0">Ver producto</span></div><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.15em]">{p.brand}</p><h3 className="mt-1 font-serif text-lg">{p.name}</h3><p className="mt-1 text-xs">{p.price}</p></Link>)}</div></section>
+      <section className="mx-auto max-w-[1500px] px-[4%] py-16 md:py-20"><div className="mb-8 flex items-end justify-between border-b border-[#d9d2cb] pb-5"><div><p className="text-[9px] uppercase tracking-[.2em] text-[#77716c]">También te puede gustar</p><h2 className="mt-2 font-serif text-4xl">Más de Moda</h2></div><Link href="/shop?category=Moda" className="text-[9px] uppercase tracking-[.16em]">Ver toda la categoría →</Link></div><div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">{related.map(p=><Link key={p.name} href={`/demo-product?sku=${encodeURIComponent(p.sku)}`} className="group"><div className="relative aspect-[3/4] overflow-hidden" style={{backgroundColor:p.tone}}><span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-[#201e1c]/10">RUA</span><span className="absolute bottom-0 left-0 right-0 translate-y-full bg-[#201e1c] py-3 text-center text-[9px] uppercase tracking-[.16em] text-white transition group-hover:translate-y-0">Ver producto</span></div><p className="mt-3 text-[9px] font-semibold uppercase tracking-[.15em]">{p.brand}</p><h3 className="mt-1 font-serif text-lg">{p.name}</h3><p className="mt-1 text-xs">{p.price}</p></Link>)}</div></section>
       <section className="bg-[#201e1c] px-[5%] py-14 text-center text-white"><RotateCcw size={20} className="mx-auto text-white/60"/><p className="mt-4 text-[9px] uppercase tracking-[.22em] text-white/55">RUA Vera · Marcas con identidad</p><h2 className="mx-auto mt-4 max-w-2xl font-serif text-3xl md:text-4xl">Descubrí piezas seleccionadas para quedarse en tu guardarropa.</h2></section>
     </main>
   );
