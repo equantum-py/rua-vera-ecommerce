@@ -1,5 +1,5 @@
 module Admin
-  class PromotionsController < ApplicationController
+  class PromotionsController < BaseController
     before_action :set_promotion, only: %i[edit update destroy]
     def index; @promotions = Promotion.includes(:category).order(created_at: :desc); end
     def new; @promotion = Promotion.new(active: true); end
